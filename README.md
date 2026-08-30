@@ -1,3 +1,4 @@
+<pre>
 /*
  * PROJECT: habbo-dev-env
  * DESC:    A declarative, isolated local development environment for Habbo Retros.
@@ -5,8 +6,8 @@
  */
 
 [UPSTREAMS]
-Orion_CMS         = "https://github.com/Orion-Server/cms"
-Arcturus_Emulator = "https://git.krews.org/morningstar/Arcturus-Community"
+Orion_CMS         = "[https://github.com/Orion-Server/cms](https://github.com/Orion-Server/cms)"
+Arcturus_Emulator = "[https://git.krews.org/morningstar/Arcturus-Community](https://git.krews.org/morningstar/Arcturus-Community)"
 
 
 [USAGE]
@@ -30,3 +31,4 @@ OUTPUT:
 |-- cms/           /* Orion source */
 |-- devenv.nix     /* Service orchestration and routing */
 `-- flake.nix      /* Dependency lock */
+</pre>
