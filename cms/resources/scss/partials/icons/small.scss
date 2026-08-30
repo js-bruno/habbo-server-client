@@ -1,0 +1,88 @@
+i.icon {
+    &.small {
+        width: 20px;
+        height: 20px;
+
+        &.home {
+            background-image: url('https://i.imgur.com/FFql1oZ.gif');
+        }
+
+        &.ifixed {
+            background-image: url('https://i.imgur.com/gjj8bcR.png');
+        }
+
+        &.male {
+            background-image: url('https://i.imgur.com/ncvNinZ.png');
+        }
+
+        &.female {
+            background-image: url('https://i.imgur.com/ZVpAxKv.png');
+        }
+    }
+
+    &.home {
+        width: 18px;
+        height: 20px;
+        border: none;
+        box-shadow: none;
+        background-color: transparent !important;
+        border-radius: 5px !important;
+
+        &.delete {
+            background-image: url('https://imgur.com/xkzcuzj.png');
+        }
+
+        &.note-edit {
+            background-image: url('https://imgur.com/0tKo423.png');
+        }
+
+        &.theme-edit {
+            background-image: url('https://imgur.com/LgmCTqt.png');
+        }
+    }
+
+    &.language {
+        width: 26px;
+        height: 26px;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        image-rendering: auto !important;
+
+        &.en {
+            background-image: url('/assets/images/country-flags/en.png');
+        }
+
+        &.es {
+            background-image: url('/assets/images/country-flags/es.png');
+        }
+
+        &.pt_br {
+            background-image: url('/assets/images/country-flags/pt_BR.png');
+        }
+
+        &.tr {
+            background-image: url('/assets/images/country-flags/tr.png');
+        }
+
+        &.da {
+            background-image: url('/assets/images/country-flags/da.png');
+        }
+
+        &.nl {
+            background-image: url('/assets/images/country-flags/nl.png');
+        }
+
+        &.fi {
+            background-image: url('/assets/images/country-flags/fi.png');
+        }
+
+        &.fr {
+            background-image: url('/assets/images/country-flags/fr.png');
+        }
+
+        &.de {
+            background-image: url('/assets/images/country-flags/de.png');
+        }
+    }
+}

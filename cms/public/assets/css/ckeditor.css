@@ -1,0 +1,35 @@
+.ck-editor__editable[role="textbox"] {
+    min-height: 250px;
+    resize: vertical;
+}
+
+html .ck-reset_all :not(.ck-reset_all-excluded *), .ck.ck-reset, .ck.ck-reset_all,
+html .ck-content,
+html .ck-source-editing-area {
+    background-color: #fff !important;
+    border-color: #e5e7eb !important;
+    color: #111827 !important;
+}
+
+html.dark .ck-reset_all :not(.ck-reset_all-excluded *), .ck.ck-reset, .ck.ck-reset_all,
+html.dark .ck-content,
+html.dark .ck-source-editing-area {
+    background-color: #09090b !important; /* gray-700 */
+    border-color: #3f3f46 !important; /* gray-600 */
+    color: white !important; /* gray-400 */
+}
+
+.ck-content menu,
+.ck-content ol,
+.ck-content ul {
+    margin: 0 0 0 0.5rem !important;
+    padding: inherit !important;
+}
+
+.ck-content ol {
+    list-style: disc;
+}
+
+.ck-content ul {
+    list-style: circle;
+}

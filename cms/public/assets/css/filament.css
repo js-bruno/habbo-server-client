@@ -1,0 +1,25 @@
+:root {
+    --scrollbar-color: #2563eb;
+}
+
+* {
+    scrollbar-color: transparent !important;
+}
+
+::-webkit-scrollbar {
+    background: transparent !important;
+    width: 5px !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-color) !important;
+}
+
+.language-switch-trigger {
+    box-shadow: none !important;
+}
+
+.language-switch-trigger img {
+    width: 34px;
+    height: 34px;
+}

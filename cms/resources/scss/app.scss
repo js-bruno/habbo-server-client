@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Includes
+@import 'includes/reset.scss';
+@import 'includes/external.scss';
+
+// Partials
+@import 'partials/icons.scss';
+@import 'partials/loader.scss';
+
+// User homes
+@import 'home/items/notes.scss';
+@import 'home/items/widgets.scss';
+@import 'home/themes.scss';
+
+html,
+body {
+    scroll-behavior: smooth;
+}
+
+:root {
+    --swiper-pagination-progressbar-bg-color: rgba(0, 0, 0, 0.10);
+    --swiper-pagination-color: rgba(0, 0, 0, 0.25);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    image-rendering: pixelated;
+}
+
+body:not(.maintenance) {
+    background: url('/assets/images/orion-bg.png'), theme('colors.slate.50');
+}
+
+html.dark body,
+body.maintenance {
+    background: url('/assets/images/orion-bg.png'), theme('colors.slate.900');
+}
+
+body.maintenance {
+    animation: backgroundPosition 20s linear infinite;
+}
+
+body.maintenance::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 928px;
+    height: 291px;
+    background: url('/assets/images/maintenance-bg.png');
+    z-index: -1;
+}
+
+@media screen and (max-width: 1024px) {
+    body.maintenance::after {
+        display: none;
+    }
+}
+
+@keyframes backgroundPosition {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+.no-pixelated {
+    image-rendering: auto !important;
+}
+
+header {
+    box-shadow: inset 0px -15px 0px 0px rgba(0, 0, 0, 0.6);
+}
+
+.logo {
+    width: var(--logo-width, 256px);
+    height: var(--logo-height, 41px);
+    position: relative;
+}
+
+.logo:hover {
+    animation: tada 1s;
+}
+
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+    scrollbar-width: auto;
+    scrollbar-color: #2058d9 #ffffff;
+}
+
+html {
+
+    /* Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+        width: 7px;
+        height: 7px
+    }
+
+    *::-webkit-scrollbar-track {
+        background: #ffffff;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        background-color: #2058d9;
+        border-radius: 3px;
+        border: 2px none #ffffff;
+    }
+
+    #discord-widget {
+        *::-webkit-scrollbar-thumb {
+            background-color: #5765F2 !important;
+        }
+    }
+
+    &.dark {
+        *::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+    }
+}
+
+.notyf {
+    z-index: 100000
+}
+
+.home-container {
+    transition: background-image 0.3s ease-in-out;
+
+    .home-draggable {
+        img {
+            max-width: 100vw !important;
+        }
+    }
+}
+
+.friendStory {
+    .story_prev,
+    .story_next {
+        height: 100%;
+        width: 50%;
+        top: 0;
+        margin-top: 0;
+
+        &::after {
+            content: none;
+        }
+    }
+
+    .story_prev {
+        left: 0;
+    }
+
+    .story_next {
+        right: 0;
+    }
+
+    .story_pagination {
+        bottom: unset !important;
+        top: 8px !important;
+        display: flex;
+        width: 90%;
+        margin-left: 5%;
+
+        .swiper-pagination-bullet {
+            flex-grow: 1;
+            border-radius: 100vh;
+            height: 4px;
+            margin: 0 2px !important;
+            background-color: rgba($color: #f7f7f5, $alpha: .4);
+            opacity: 1;
+
+            .swiper-pagination-progress {
+                height: 100%;
+                width: 0%;
+                border-radius: 100vh;
+                background-color: #f7f7f5;
+            }
+        }
+    }
+}
