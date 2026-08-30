@@ -1,34 +1,32 @@
-habbo-dev-env
-=============
+/*
+ * PROJECT: habbo-dev-env
+ * DESC:    A declarative, isolated local development environment for Habbo Retros.
+ *          Runs Nginx, PHP, MySQL, and the emulator via Nix/Devenv.
+ */
 
-A declarative, isolated local development environment for Habbo Retros. 
-Runs Nginx, PHP, MySQL, and the emulator via Nix/Devenv without global system modifications.
+[UPSTREAMS]
+Orion_CMS         = "https://github.com/Orion-Server/cms"
+Arcturus_Emulator = "https://git.krews.org/morningstar/Arcturus-Community"
 
-Upstreams
----------
-* Orion CMS: https://github.com/Orion-Server/cms
-* Arcturus Emulator: https://git.krews.org/morningstar/Arcturus-Community
 
-Usage
------
-Requires Nix with Flakes enabled.
+[USAGE]
+> git clone <repo-url> habbo-dev
+> cd habbo-dev
 
-$ git clone <repo-url> habbo-dev
-$ cd habbo-dev
+/* Provision Nginx, PHP, Node, Java */
+> nix develop
 
-# Drop into the environment (provisions Nginx, PHP, Node, Java)
-$ nix develop
+/* Start Web server, DB, Emulator */
+> devenv up
 
-# Start all services (Web server, DB, Emulator)
-$ devenv up
+OUTPUT:
+  Frontend -> http://localhost:8080
+  Exit     -> Ctrl+C
 
-The CMS will be available at http://localhost:8080.
-Press Ctrl+C to terminate all processes.
 
-Structure
----------
+[STRUCTURE]
 .
-├── arcturus/        # Emulator source and .jar
-├── cms/             # Orion source
-├── devenv.nix       # Service orchestration and routing
-└── flake.nix        # Dependency lock
+|-- arcturus/      /* Emulator source and .jar */
+|-- cms/           /* Orion source */
+|-- devenv.nix     /* Service orchestration and routing */
+`-- flake.nix      /* Dependency lock */
