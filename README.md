@@ -31,4 +31,8 @@ OUTPUT:
 |-- cms/           /* Orion source */
 |-- devenv.nix     /* Service orchestration and routing */
 `-- flake.nix      /* Dependency lock */
+
+[TODO]
+ [] - Terminar de configurar o cms orion, carregando a env e o conectando com o mysql
+
 </pre>
