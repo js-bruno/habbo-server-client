@@ -10,7 +10,6 @@ src/test/
 target/
 config.ini
 *.txt
-*.jar
 *.log
 *.zip
 .DS_Store
