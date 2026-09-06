@@ -1,0 +1,53 @@
+@php
+    $isContained = $isContained();
+@endphp
+<div x-data="{}"
+     x-load-css="[@js(\Filament\Support\Facades\FilamentAsset::getStyleHref('activitylog-styles', package: 'rmsramos/activitylog'))]"
+>
+</div>
+
+<x-dynamic-component :component="$getEntryWrapperView()" :entry="$entry">
+    <div
+        {{
+            $attributes
+                ->merge([
+                    'id' => $getId(),
+                ], escape: false)
+                ->merge($getExtraAttributes(), escape: false)
+                ->class([
+                    'fi-in-repeatable',
+                    'fi-contained' => $isContained,
+                ])
+        }}
+    >
+        @if (count($childComponentContainers = $getChildComponentContainers()))
+            <ol class="relative border-gray-200 border-s dark:border-gray-700">
+                <x-filament-schemas::grid
+                    :default="$getGridColumns('default')"
+                    :sm="$getGridColumns('sm')"
+                    :md="$getGridColumns('md')"
+                    :lg="$getGridColumns('lg')"
+                    :xl="$getGridColumns('xl')"
+                    :two-xl="$getGridColumns('2xl')"
+                    class="gap-2"
+                >
+                    @foreach ($childComponentContainers as $container)
+                        <li
+                            @class([
+                                'mb-4 ms-6',
+                                'fi-in-repeatable-item block',
+                                'rounded-xl bg-white p-4 shadow-xs ring-1 ring-gray-950/5 dark:bg-white/5 dark:ring-white/10' => $isContained,
+                            ])
+                        >
+                            {{ $container }}
+                        </li>
+                    @endforeach
+                </x-filament-schemas::grid>
+            </ol>
+        @elseif (($placeholder = $getPlaceholder()) !== null)
+            <div class="text-gray-500 text-sm p-4">
+                {{ $placeholder }}
+            </div>
+        @endif
+    </div>
+</x-dynamic-component>

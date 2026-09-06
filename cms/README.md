@@ -1,75 +1,328 @@
+<div align="center">
+<img src="https://i.imgur.com/9ePNdJ4.png" alt="Atom CMS"/>
+
+A modern, community-driven Retro CMS built with Laravel 13.x
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?style=flat&logo=discord&logoColor=white)](https://discord.gg/pP6HyZedAj)
+[![Laravel](https://img.shields.io/badge/Laravel-13.x-FF2D20?style=flat&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.5+-777BB4?style=flat&logo=php&logoColor=white)](https://php.net)
+
+[Live Demos](#live-preview) • [Installation](#installation) • [Documentation](https://github.com/ObjectRetros/atomcms/wiki) • [Contributing](#contributing)
+
+</div>
+
+>[!NOTE]
+>Disclaimer: Educational Use Only
+> 
+> Atom CMS is provided as an educational resource for learning purposes only. The creators and contributors are not responsible for any misuse or unintended consequences arising from its use. By using Atom CMS, you agree to take full responsibility for your actions and ensure compliance with all applicable laws and regulations in your jurisdiction.
 
 
-<p align="center"><a href="https://github.com/orion-server/cms" target="_blank"><img src="https://i.imgur.com/ZqE16Ph.png" width="263" alt="OrionCMS Logo"></a></p>
+## About
 
-<p align="center">
-<a href="https://github.com/orion-server/cms"><img src="https://img.shields.io/github/license/orion-server/cms" alt="License"></a>
-<a href="https://github.com/orion-server/cms"><img src="https://img.shields.io/github/last-commit/orion-server/cms" alt="Last Commit"></a>
-<a href="https://github.com/orion-server/cms"><img src="https://img.shields.io/github/stars/orion-server" alt="Stars"></a>
-</p>
+Atom CMS is a modern, community-driven CMS designed to provide a flexible and user-friendly platform for retro hotel management. Built on Laravel 13.x with a focus on extensibility and ease of use, Atom CMS features a built-in theme system that allows you to use any CSS framework or create fully customized vanilla designs.
 
-## ⚠️ An important notice about Orion:
+### Built With
 
-**Orion's development will pause**. After a year of development, I met all my expectations regarding the system and as much as I would like to bring more updates, it is currently not possible because things have changed, my priorities are different and now  > **I am stopping working with Habbo** <.
+- **[Laravel 13.x](https://laravel.com/docs/13.x)** - Elegant PHP framework powering the backend
+- **[Livewire 4](https://livewire.laravel.com/)** - Dynamic frontend components without leaving Blade
+- **[Filament 5](https://filamentphp.com/)** - Powering the integrated housekeeping panel
+- **[Vite](https://vitejs.dev/)** - Next-generation frontend tooling for blazing-fast builds
+- **[TailwindCSS 4](https://tailwindcss.com/)** - Utility-first CSS framework for responsive design
 
-If you use Orion or are reading this intending to use Orion, **listen up: It's still a safe system to use, and you can use it without any problems**. The only difference is that there will no longer be new systems.
+---
 
-Help channels and general will remain open.
+## Features
 
-**OBS: Important updates (such as vulnerabilities) will continue to be updated!**
+- **Built-in Theme System** - Use any CSS framework or create custom themes
+- **Secure Authentication** - Laravel-powered authentication and authorization
+- **Multi-language Support** - Built-in localization for global audiences
+- **Integrated Housekeeping** - Comprehensive Filament-powered admin panel
+- **Rcon System** - Real-time server communication
+- **Responsive Design** - Mobile-first approach with TailwindCSS
+- **Modern Stack** - Latest PHP 8.5+ features, PHPStan level 8 static analysis
 
-## 🌀 Introduction
+---
 
-**OrionCMS** (Content Management System) is a system that promotes **usability** and **manageability** for your hotel. Orion's purpose is to make your experience and that of your players the best experience possible.
+## Live Preview
 
-**Built with the most modern technologies for websites**, OrionCMS will provide a lot of security and modernity for your hotel, in addition to containing exclusive systems that will make a difference in your day-to-day.
+Experience Atom CMS with our official themes:
 
-Touching on the subject of differences, the Orion dashboard will surely surprise you. Fully responsive, elegant, secure, and real-time. Most of the updates made to the panel will be reflected in the game, **and that's really surreal**.
+- **Dusk Theme**: [https://dusk.atomcms.dev](https://dusk.atomcms.dev)
+- **Atom Theme**: [https://atom.atomcms.dev](https://atom.atomcms.dev)
 
-# 🌟 What technologies are used in OrionCMS?
+---
 
-The main technologies that make up the structure of Orion and its systems are:
+## Requirements
 
-- [Laravel ^10](https://laravel.com/)
-- [AlpineJS](https://alpinejs.dev/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [Filament](https://filamentphp.com/)
+| Requirement | Version |
+|------------|---------|
+| PHP | 8.5 or higher |
+| MySQL | 8.x or higher |
+| MariaDB | 10.x or higher |
+| Composer | v2 |
+| Node.js | LTS |
+| Database | Arcturus Morningstar 3.5.5 (bundled, imported by the installer) |
 
-However, there are several other technologies that make the magic happen:
+### Required PHP Extensions
 
-- [Turbolinks](https://hotwired.dev/)
-- [SASS](https://sass-lang.com/)
-- [Vite](https://vitejs.dev/)
-- [TippyJS](https://atomiks.github.io/tippyjs/)
+Ensure the following extensions are enabled in your `php.ini`:
 
-And others...
+```ini
+extension=curl
+extension=fileinfo
+extension=gd
+extension=mbstring
+extension=openssl
+extension=pdo_mysql
+extension=sockets
+extension=intl
+```
 
-# ✅ Supported Emulators
+**Note:** Remove the semicolon (`;`) prefix if the extension is commented out.
 
-Currently, the only emulator supported by OrionCMS is [Arcturus](https://git.krews.org/morningstar/Arcturus-Community).
+---
 
-## 📕 Wiki (Installation)
+## Installation
 
-If you want to install **OrionCMS** in your hotel, know that we have an installation page ready to help you. We have an example in **Linux** and **Windows**.
+### Quick Setup (Recommended)
 
-The wiki site can be accessed [here](https://github.com/Orion-Server/cms/wiki).
+One command installs everything - dependencies, the bundled Arcturus Morningstar 3.5.5 base database with an up-to-date catalog, app key, storage link, migrations, seeders and your theme's assets:
 
-## ⚡ Contributors
+```bash
+git clone https://github.com/ObjectRetros/atomcms.git
+cd atomcms
 
-We have a list of contributors who have helped us in the development of OrionCMS. We are very grateful to everyone who has contributed to the project, and we hope to continue to count on your help.
+composer setup
+```
 
-- **Ekrisium** - FR translations
-- **Duckietm** - Linux/NGINX tutorials
-- **Object** - DA translations and Docker file
-- **Kaio** - Windows/IIS tutorials
-- **Lariesse** - TR translations
-- **Kamil** - DE translations
-- **Assholic** - Amazing GFX
+The installer prompts for your database credentials, offers to create the database if it doesn't exist, and imports the Arcturus base SQL automatically (skipped if the tables already exist). On Windows it connects the questions directly to the console even though Composer cannot allocate a child-process TTY. It then asks which theme you want (atom or dusk), activates it and builds its assets. When it finishes, serve the site and visit `/installation` to configure your hotel.
 
-## ✍ Leability Notice
+Useful variations:
 
-**OrionCMS** is just **a hobby for educational and open-source studies**, so **you agree to assume** all **responsibility for the use of OrionCMS** in your project. The **creator and its developers cannot be held responsible for the misuse of the system**. Rest assured that by using Orion you agree to assume responsibility and consequences for using this system.
+```bash
+php artisan atom:install                            # Re-run just the installer (no dependency install)
+php artisan atom:install --sql=/path/to/db.sql      # Use your own Arcturus dump (.sql or .sql.gz)
+php artisan atom:install --catalog-sql=/path/to.sql # Use your own catalog dump on top of the base
+php artisan atom:install --skip-catalog             # Keep the stock catalog from the base database
+php artisan atom:install --skip-arcturus            # Skip the base database + catalog import entirely
+php artisan atom:install --theme=dusk               # Pick the theme without being asked
+php artisan atom:install --skip-build               # Skip building theme assets (npm run build:atom|dusk)
+```
 
-## License
+Prefer to do it step by step? Follow the manual guides below.
 
-The OrionCMS is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### Windows Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/ObjectRetros/atomcms.git
+cd atomcms
+
+# Configure environment
+copy .env.example .env
+# Edit .env and update your database credentials
+
+# Install dependencies
+composer install
+npm install
+
+# Generate key and set up database
+php artisan key:generate
+php artisan migrate --seed
+
+# Build assets
+npm run build:atom
+# For development: npm run dev:atom
+```
+
+#### IIS Configuration
+
+Point your IIS site to the `public` folder inside the `atomcms` directory.
+
+#### Required Permissions
+
+Grant "Full control" to both `IUSR` and `IIS_IUSRS` for the atomcms folder.
+
+**Visual guide:** [Permission setup tutorial](https://gyazo.com/7d5f38525a762c1b26bbd7552ca93478)
+
+#### Troubleshooting cURL SSL Errors
+
+If you encounter cURL 60 errors:
+
+1. Download the latest [cacert.pem](https://curl.se/docs/caextract.html)
+2. Place it in `C:/`
+3. Edit `php.ini` and update:
+   ```ini
+   curl.cainfo = "C:/cacert-2025-09-09.pem"
+   ```
+4. Restart your web server
+
+#### Complete Windows Tutorial
+
+New to retro hotel setup? Follow our comprehensive three-part series:
+
+- [Part 1: Basic Setup](https://devbest.com/threads/how-to-set-up-a-retro-in-2022-iis-nitro-html5-part-1.92532/)
+- [Part 2: Configuration](https://devbest.com/threads/how-to-set-up-a-retro-in-2022-iis-nitro-html5-part-2.92533/)
+- [Part 3: Finalization](https://devbest.com/threads/how-to-set-up-a-retro-in-2022-iis-nitro-html5-part-3.92543/)
+
+---
+
+### Linux Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/ObjectRetros/atomcms.git
+cd atomcms
+
+# Configure environment
+cp .env.example .env
+# Edit .env and update your database credentials
+
+# Install dependencies
+composer install
+npm install
+
+# Generate key and set up database
+php artisan key:generate
+php artisan migrate --seed
+
+# Build assets
+npm run build:atom
+# For development: npm run dev:atom
+```
+
+#### Set Permissions
+
+```bash
+sudo chown -R $USER:www-data storage
+sudo chown -R $USER:www-data bootstrap/cache
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
+```
+
+#### NGINX Configuration
+
+For NGINX setup, refer to Laravel's [deployment documentation](https://laravel.com/docs/13.x/deployment#nginx).
+
+#### Complete Linux Tutorial
+
+Need help setting up your retro hotel on Linux? Follow our comprehensive Ubuntu tutorial:
+
+- [Complete Ubuntu Setup Guide](https://git.krews.org/duckietm/ubuntu-tutorial) - Step-by-step instructions for Ubuntu
+
+---
+
+## Configuration
+
+### Production Environment
+
+Update these variables in your `.env` file for production:
+
+```dotenv
+APP_ENV=production
+APP_DEBUG=false
+FORCE_HTTPS=true  # If using Cloudflare's "Always use HTTPS"
+```
+
+### Cloudflare Turnstile Captcha
+
+Protect your site from bots:
+
+1. Visit [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/)
+2. Sign in and select your site
+3. Copy the site and secret keys to `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY` in your `.env` file
+
+### Important: Disable Rocket Loader
+
+Atom CMS uses JavaScript that conflicts with Cloudflare's Rocket Loader. To disable:
+
+1. Go to your Cloudflare dashboard
+2. Navigate to **Speed** → **Optimization**
+3. Find **Rocket Loader™** and disable it
+
+### Migrating from Another CMS
+
+If migrating from Cosmic CMS or similar platforms:
+
+Set `RENAME_COLLIDING_TABLES=true` in your `.env` file. Atom CMS will automatically handle table conflicts.
+
+**Note:** We recommend proper manual cleanup, but this feature helps avoid common migration issues.
+
+---
+
+## Testing
+
+Atom CMS includes a growing test suite using Pest.
+
+### Run Tests
+
+```bash
+# Using Pest
+vendor/bin/pest
+
+# Using Artisan
+php artisan test
+```
+
+---
+
+## Documentation
+
+For detailed documentation, addons, tips, and tricks, visit our [official wiki](https://github.com/ObjectRetros/atomcms/wiki).
+
+### Learning Laravel
+
+New to Laravel? These free resources will help:
+- [Official bootcamp & course](https://learn.laravel.com) - Official Laravel bootcamp & course
+- [Laracasts](https://laracasts.com) - Video courses covering Laravel, Livewire, testing and more
+---
+
+## Contributing
+
+We welcome contributions! To maintain code quality and streamline reviews, please read our [contribution guidelines](https://github.com/ObjectRetros/atomcms/wiki/0.-Contribution-guidelines) before submitting a pull request.
+
+---
+
+## Credits
+
+Atom CMS is made possible by our amazing community:
+
+### Core Contributors
+
+- **Kasja** - Design direction, Dusk theme, ideas & graphics
+- **INicollas** - Dark mode, Turbolinks, article reactions, user sessions, PT-BR translations, Orion Housekeeping
+- **Kani** - Rcon system, FindRetros API, Atom CMS v2 creator/maintainer
+- **DuckieTM** - Badge drawer, bugfixes, housekeeping features
+- **EntenKoeniq** - Auto language registration, color scheme selection, various page fixes
+
+### Contributors
+
+- **Dominic** - Performance improvements, user sessions
+- **Beny** - FindRetros API fixes, Cloudflare fixes
+- **Live** - French translations, bugfixes
+- **MisterDeen** - Custom Discord widget
+- **DamienJolly**, **Danbo**, **Diddy/Josh** - Various bugfixes and improvements
+- **Sonay** - Material theme inspiration
+- **Raizer** - Circinus
+
+### Translations
+
+- **Oliver** - Finnish
+- **Damue & EntenKoeniq** - German
+- **Talion** - Turkish
+- **CentralCee, Rille & Tuborgs** - Swedish
+- **Yannick** - Dutch
+- **Gedomi** - Spanish
+- **Lorenzune** - Italian
+- **Twana** - Norwegian
+- **Plow** - French
+
+---
+
+<div align="center">
+
+**[⬆ Back to Top](#readme)**
+
+Made with ❤️ by the Atom CMS Community
+
+</div>

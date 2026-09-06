@@ -2,39 +2,66 @@
 
 namespace App\Services;
 
-use App\Models\CmsSetting;
+use App\Models\Miscellaneous\WebsiteSetting;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class SettingsService
 {
-    public ?Collection $allSettings;
+    /** @var Collection<string, mixed>|null */
+    private ?Collection $cachedSettings = null;
 
-    public function __construct()
+    /** @return Collection<string, mixed> */
+    protected function settings(): Collection
     {
-        $this->loadSettingsFromDatabase();
-    }
-
-    private function loadSettingsFromDatabase(): void
-    {
-        try {
-            $this->allSettings = CmsSetting::all()->pluck('value', 'key');
-        } catch (\Throwable $ignored) {
-            $this->allSettings = collect();
+        if ($this->cachedSettings !== null) {
+            return $this->cachedSettings;
         }
+
+        if ($this->isInstallationIncomplete()) {
+            $this->cachedSettings = $this->fetchSettings();
+
+            return $this->cachedSettings;
+        }
+
+        $this->cachedSettings = collect(Cache::rememberForever('website_settings', function () {
+            return $this->fetchSettings()->toArray();
+        }));
+
+        return $this->cachedSettings;
     }
 
-    public function get(string $key, ?string $defaultValue = null): mixed
+    /**
+     * @template TDefault
+     *
+     * @param  TDefault  $default
+     *
+     * @return string|TDefault
+     */
+    public function getOrDefault(string $key, mixed $default = null): mixed
     {
-        return $this->allSettings->get($key, $defaultValue);
+        return $this->settings()->get($key, $default);
     }
 
-    public function set(string $key, string $value, ?string $comment = null): void
+    public static function clearCache(): void
     {
-        $this->allSettings->put($key, $value);
+        Cache::forget('website_settings');
+        app()->forgetInstance(self::class);
+    }
 
-        CmsSetting::updateOrCreate(['key' => $key], [
-            'value' => $value,
-            'comment' => $comment
-        ]);
+    private function isInstallationIncomplete(): bool
+    {
+        return ! app(InstallationService::class)->isComplete();
+    }
+
+    /** @return Collection<string, mixed> */
+    private function fetchSettings(): Collection
+    {
+        if (! Schema::hasTable('website_settings')) {
+            return collect();
+        }
+
+        return WebsiteSetting::query()->pluck('value', 'key');
     }
 }

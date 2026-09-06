@@ -13,10 +13,10 @@ return [
     |
     */
 
-    'reset' => 'Salasanasi on nollattu.',
-    'sent' => 'Olemme lähettäneet sähköpostitse salasanan nollauslinkin.',
-    'throttled' => 'Odota hetki ennen uudelleenyritystä.',
-    'token' => 'Tämä salasanan nollausavain on virheellinen.',
-    'user' => 'Emme löydä käyttäjää kyseisellä sähköpostiosoitteella.',
+    'reset' => 'Your password has been reset!',
+    'sent' => 'We have emailed your password reset link!',
+    'throttled' => 'Please wait before retrying.',
+    'token' => 'This password reset token is invalid.',
+    'user' => "We can't find a user with that email address.",
 
 ];

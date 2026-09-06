@@ -48,7 +48,7 @@ return [
 
     'username' => 'username',
 
-    'email' => 'mail',
+    'email' => 'email',
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ return [
     |
     */
 
-    'prefix' => '',
+    'prefix' => env('FORTIFY_PREFIX', ''),
 
     'domain' => null,
 
@@ -89,7 +89,7 @@ return [
     |
     */
 
-    'middleware' => ['web', 'cms.maintenance', 'verify.punishments'],
+    'middleware' => ['web', 'maintenance', 'check.ban'],
 
     /*
     |--------------------------------------------------------------------------
@@ -118,7 +118,7 @@ return [
     |
     */
 
-    'views' => false,
+    'views' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -136,12 +136,12 @@ return [
         // Features::resetPasswords(),
         // Features::emailVerification(),
         // Features::updateProfileInformation(),
-        Features::updatePasswords(),
+        // Features::updatePasswords(),
         Features::twoFactorAuthentication([
             'confirm' => true,
             'confirmPassword' => true,
             // 'window' => 0,
         ]),
-    ]
+    ],
 
 ];

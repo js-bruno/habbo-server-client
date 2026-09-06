@@ -31,35 +31,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'google' => [
-        'client_id' => env('GOOGLE_CLIENT_ID'),
-        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('APP_URL') . '/login/google/callback',
+    'turnstile' => [
+        'key' => env('TURNSTILE_SITE_KEY'),
+        'secret' => env('TURNSTILE_SECRET_KEY'),
     ],
-
-    'facebook' => [
-        'client_id' => env('FACEBOOK_CLIENT_ID'),
-        'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
-        'redirect' => env('APP_URL') . '/login/facebook/callback',
-    ],
-
-    'discord' => [
-        'client_id' => env('DISCORD_CLIENT_ID'),
-        'client_secret' => env('DISCORD_CLIENT_SECRET'),
-        'redirect' => env('APP_URL') . '/login/discord/callback',
-
-        // optional
-        'allow_gif_avatars' => (bool) env('DISCORD_AVATAR_GIF', true),
-        'avatar_default_extension' => env('DISCORD_EXTENSION_DEFAULT', 'png'), // only pick from jpg, png, webp
-    ],
-
-    'findretros' => [
-        'verify_vote_uri' => 'https://findretros.com/validate.php?user=%s&ip=%s',
-        'redirect_vote_uri' => 'https://findretros.com/servers/%s/vote?return=1&minimal=1',
-        'session_key' => 'fr_%s_voted',
-        ],
-
-        'ipdata' => [
-            'api_key' => env('IPDATA_API_KEY'),
-        ]
 ];

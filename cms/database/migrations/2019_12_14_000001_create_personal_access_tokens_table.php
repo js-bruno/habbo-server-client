@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if(config('app.skip_similar_migrations') && Schema::hasTable('personal_access_tokens')) return;
+        if (config('habbo.migrations.rename_tables') && Schema::hasTable('personal_access_tokens')) {
+            Schema::rename('personal_access_tokens', sprintf('personal_access_tokens_%s', time()));
+        }
 
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
@@ -20,7 +22,6 @@ return new class extends Migration
             $table->string('token', 64)->unique();
             $table->text('abilities')->nullable();
             $table->timestamp('last_used_at')->nullable();
-            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
     }

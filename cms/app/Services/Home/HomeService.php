@@ -1,0 +1,190 @@
+<?php
+
+namespace App\Services\Home;
+
+use App\Emulator\Contracts\CurrencyRepository;
+use App\Enums\HomeItemType;
+use App\Exceptions\HomePurchaseException;
+use App\Models\Home\HomeItem;
+use App\Models\Home\UserHomeItem;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+class HomeService
+{
+    public function __construct(private readonly CurrencyRepository $currencies) {}
+
+    private function ensurePurchaseIsAllowed(User $user, HomeItem $item, int $quantity, int $totalPrice): void
+    {
+        if ($user->online) {
+            throw new HomePurchaseException(__('You must be offline to buy this item.'));
+        }
+
+        if (! $item->enabled) {
+            throw new HomePurchaseException(__('This item is not available for purchase.'));
+        }
+
+        if ($item->hasExceededPurchaseLimit()) {
+            throw new HomePurchaseException(__('This item exceeded the purchase limit.'));
+        }
+
+        if ($item->limit !== null && ($item->total_bought + $quantity) > $item->limit) {
+            throw new HomePurchaseException(__("You can't buy more than :max of this item.", [
+                'max' => $item->limit - $item->total_bought,
+            ]));
+        }
+
+        if ($totalPrice > $this->currencies->balance($user, $item->currency_type)) {
+            throw new HomePurchaseException(__("You don't have enough :currency to buy this item.", [
+                'currency' => strtolower(__($item->currency_type->name)),
+            ]));
+        }
+
+        if (in_array($item->type, [HomeItemType::Background, HomeItemType::Widget])
+            && $user->homeItems()->where('home_item_id', $item->id)->exists()) {
+            throw new HomePurchaseException(__('You already have this item in your inventory.'));
+        }
+
+        if (in_array($item->type, [HomeItemType::Background, HomeItemType::Widget]) && $quantity > 1) {
+            throw new HomePurchaseException(__('You can buy this item only once.'));
+        }
+    }
+
+    public function buyItem(User $user, int $itemId, int $quantity): HomeItem
+    {
+        return DB::transaction(function () use ($user, $itemId, $quantity): HomeItem {
+            $lockedUser = User::query()
+                ->whereKey($user->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $item = HomeItem::query()
+                ->whereKey($itemId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $totalPrice = $item->price * $quantity;
+
+            $this->ensurePurchaseIsAllowed($lockedUser, $item, $quantity, $totalPrice);
+
+            if (! $this->currencies->deduct($lockedUser, $item->currency_type, $totalPrice)) {
+                throw new HomePurchaseException(__('Insufficient balance.'));
+            }
+
+            $lockedUser->giveHomeItem($item, $quantity);
+
+            return $item;
+        });
+    }
+
+    /** @param  array{backgroundId?: int, items?: list<array<string, mixed>>}  $data */
+    public function saveItems(User $user, array $data): void
+    {
+        if (isset($data['backgroundId'])) {
+            $background = $user->inventoryHomeItems()->find($data['backgroundId']);
+
+            if ($background) {
+                $user->changeHomeBackground($background);
+            }
+        }
+
+        if (! isset($data['items']) || count($data['items']) < 1) {
+            return;
+        }
+
+        $itemsCollection = collect($data['items']);
+
+        $allItems = $user->homeItems()
+            ->defaultRelationships()
+            ->whereIn('id', $itemsCollection->pluck('id'))
+            ->get();
+
+        DB::transaction(function () use ($itemsCollection, $allItems): void {
+            $allItems->each(function (UserHomeItem $item) use ($itemsCollection): void {
+                $itemData = $itemsCollection->where('id', $item->id)->first();
+                $homeItem = $item->homeItem;
+
+                if ($homeItem === null) {
+                    return;
+                }
+
+                $item->placed = (bool) ($itemData['placed'] ?? $item->placed);
+                $item->x = (int) ($itemData['x'] ?? $item->x);
+                $item->y = (int) ($itemData['y'] ?? $item->y);
+                $item->z = (int) ($itemData['z'] ?? $item->z);
+                $item->is_reversed = (bool) ($itemData['is_reversed'] ?? $item->is_reversed);
+                $item->theme = $itemData['theme'] ?? $homeItem->getDefaultTheme();
+
+                if (! empty($itemData['extra_data'])) {
+                    $item->extra_data = strip_tags($itemData['extra_data']);
+                }
+
+                if (! $item->placed && $homeItem->type === HomeItemType::Note) {
+                    $item->extra_data = '';
+                }
+
+                if ($item->isDirty()) {
+                    $item->save();
+                }
+            });
+        });
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getLatestPurchaseItemIds(User $user, HomeItem $item, int $quantity): array
+    {
+        $results = DB::select(
+            'SELECT hi.id, hi.type, hi.name, hi.image, uhi.home_item_id, JSON_ARRAYAGG(uhi.id) AS item_ids
+            FROM (
+                SELECT home_item_id, id
+                FROM user_home_items
+                WHERE user_id = ?
+                AND placed = ?
+                AND home_item_id = ?
+                ORDER BY id DESC
+                LIMIT ?
+            ) AS uhi
+            JOIN home_items hi ON hi.id = uhi.home_item_id
+            GROUP BY hi.id, hi.type, hi.name, hi.image, uhi.home_item_id',
+            [$user->id, 0, $item->id, $quantity],
+        );
+
+        return array_map(fn ($row) => [
+            'home_item_id' => $row->home_item_id,
+            'item_ids' => json_decode($row->item_ids),
+            'home_item' => [
+                'id' => $row->id,
+                'type' => $row->type,
+                'name' => $row->name,
+                'image' => $row->image,
+            ],
+        ], $results);
+    }
+
+    public function getWidgetContent(User $user, UserHomeItem $item): ?string
+    {
+        $viewName = "home.widgets.{$item->widget_type}";
+
+        if (! view()->exists($viewName)) {
+            return null;
+        }
+
+        $user = $this->loadWidgetData($user, $item);
+
+        return view($viewName, compact('item', 'user'))->render();
+    }
+
+    private function loadWidgetData(User $user, UserHomeItem $item): User
+    {
+        return match ($item->widget_type) {
+            'my-rooms' => $user->loadRoomsForHome(),
+            'my-badges' => $user->loadBadgesForHome('home.show'),
+            'my-friends' => $user->loadFriendsForHome('home.show'),
+            'my-rating' => $user->loadRatingsForHome(),
+            'my-guestbook' => $user->loadGuestbookForHome(),
+            default => $user,
+        };
+    }
+}

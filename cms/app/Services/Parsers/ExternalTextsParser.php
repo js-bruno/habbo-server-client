@@ -2,60 +2,64 @@
 
 namespace App\Services\Parsers;
 
-use App\Services\Parsers\Badge\FlashBadgeParser;
-use App\Services\Parsers\Badge\NitroBadgeParser;
+use App\Services\Badge\FlashExternalTexts;
+use App\Services\Badge\NitroExternalTexts;
+use App\Services\SettingsService;
+use App\Support\BadgeCode;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * @author iNicollas <inicollas>
+ * Reads and writes a badge's name/description across the client text files -
+ * the Nitro external texts JSON and the flash external texts key=value file -
+ * and resolves where its image lives. Backs the housekeeping badge page.
  */
 class ExternalTextsParser
 {
-    protected ?NitroBadgeParser $nitroParser = null;
-    protected ?FlashBadgeParser $flashParser = null;
+    public function __construct(
+        private readonly NitroExternalTexts $nitroTexts,
+        private readonly FlashExternalTexts $flashTexts,
+        private readonly SettingsService $settings,
+    ) {}
 
-    public function __construct() {
-        $this->nitroParser = new NitroBadgeParser();
-        $this->flashParser = new FlashBadgeParser();
-    }
-
-    public function getBadgeData(string $badgeCode): array
+    /**
+     * @return array{
+     *     image: string|null,
+     *     nitro: array{title: string, description: string}|null,
+     *     flash: array{title: string, description: string}|null,
+     * }
+     */
+    public function getBadgeData(string $code): array
     {
+        $code = BadgeCode::normalize($code);
+
         return [
-            'code' => $badgeCode,
-            'image' => $this->getBadgeImageUrl($badgeCode),
-            'nitro' => $this->nitroParser->getBadgeData($badgeCode),
-            'flash' => $this->flashParser->getBadgeData($badgeCode)
+            'image' => Storage::disk('badges')->exists(BadgeCode::filename($code)) ? $this->getBadgeImageUrl($code) : null,
+            'nitro' => $this->nitroTexts->find($code),
+            'flash' => $this->flashTexts->find($code),
         ];
     }
 
-    public function getBadgeImageUrl(string $badgeCode): string
+    /**
+     * The parameter names double as named arguments: the badge page spreads
+     * its form state (title/description) into these calls.
+     */
+    public function updateNitroBadgeTexts(string $code, string $title = '', string $description = ''): void
     {
-        return sprintf('%s%s.gif', getSetting('badges_path'), $badgeCode);
+        $this->nitroTexts->add(BadgeCode::normalize($code), $title, $description);
     }
 
-    public function updateNitroBadgeTexts(
-        string $code,
-        string $title,
-        string $description
-    ): void {
-        $this->nitroParser->updateBadgeTexts($code, $title, $description);
-    }
-
-    public function updateFlashBadgeTexts(
-        string $code,
-        string $title,
-        string $description
-    ): void {
-        $this->flashParser->updateBadgeTexts($code, $title, $description);
-    }
-
-    public function getNitroParser(): ?NitroBadgeParser
+    public function updateFlashBadgeTexts(string $code, string $title = '', string $description = ''): void
     {
-        return $this->nitroParser;
+        $this->flashTexts->add(BadgeCode::normalize($code), $title, $description);
     }
 
-    public function getFlashParser(): ?FlashBadgeParser
+    public function getBadgeImageUrl(string $code): string
     {
-        return $this->flashParser;
+        $baseUrl = rtrim((string) $this->settings->getOrDefault('badges_path', '/badges'), '/');
+        $path = $baseUrl . '/' . rawurlencode(BadgeCode::normalize($code)) . '.gif';
+
+        return str_starts_with($path, 'https://') || str_starts_with($path, 'http://')
+            ? $path
+            : url($path);
     }
 }

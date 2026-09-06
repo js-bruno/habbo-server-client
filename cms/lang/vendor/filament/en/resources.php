@@ -331,10 +331,14 @@ return [
         'receiver' => 'Receiver',
         'message' => 'Message',
         'room' => 'Room',
+        'permission' => 'Permission',
+        'min_rank' => 'Minimum Rank',
     ],
 
     'columns' => [
         'id' => 'ID',
+		'user_id' => 'User ID',
+		'room_id' => 'Room ID',
         'badge' => 'Badge',
         'name' => 'Name',
         'level' => 'Level',
@@ -394,6 +398,9 @@ return [
         'receiver' => 'Receiver',
         'message' => 'Message',
         'room' => 'Room',
+        'permission' => 'Permission',
+        'min_rank' => 'Minimum Rank',
+        'description' => 'Description',
     ],
 
     'options' => [
@@ -454,6 +461,10 @@ return [
         'photos_count' => [
             'title' => 'Photos Count',
             'description' => 'photos uploaded.',
+        ],
+		'badge_count' => [
+            'title' => 'Badge Count',
+            'description' => 'Avalible Badges.',
         ],
         'articles_chart' => [
             'title' => 'Articles (Monthly)',

@@ -335,6 +335,8 @@ return [
 
     'columns' => [
         'id' => 'ID',
+		`'user_id' => 'User ID',
+		'room_id' => 'Room ID',
         'badge' => 'Emblema',
         'name' => 'Nome',
         'level' => 'Nível',
@@ -444,6 +446,10 @@ return [
         'photos_count' => [
             'title' => 'Fotos Postadas',
             'description' => 'fotos compradas.',
+        ],
+		'badge_count' => [
+            'title' => 'Contagem de emblemas',
+            'description' => 'Emblemas disponíveis.',
         ],
         'articles_chart' => [
             'title' => 'Artigos (Mensal)',

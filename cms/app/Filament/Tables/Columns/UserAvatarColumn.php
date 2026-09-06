@@ -15,13 +15,13 @@ class UserAvatarColumn extends Column
     public function getAvatarUrl(): string
     {
         $record = $this->getRecord();
-        $figureImagerUrl = getSetting('figure_imager');
+        $figureImagerUrl = setting('avatar_imager');
 
-        if (!$figureImagerUrl) return '';
+        if (! $figureImagerUrl) {
+            return '';
+        }
 
-        $figure = ! $this->figurePointer
-            ? $record->look
-            : data_get($record, $this->figurePointer);
+        $figure = (string) data_get($record, $this->figurePointer ?? 'look', '');
 
         return "{$figureImagerUrl}{$figure}{$this->avatarOptions}";
     }

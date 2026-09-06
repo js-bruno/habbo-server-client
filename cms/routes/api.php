@@ -1,11 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\ApiController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\HotelApiController;
+use App\Http\Controllers\Shop\PaypalWebhookController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\InviteController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\ShopProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,40 +10,13 @@ use App\Http\Controllers\Api\ShopProductController;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::get('referral/{code}', [InviteController::class, 'getReferralUsername']);
-Route::post('bbcode/preview', [ApiController::class, 'getBBCodePreview'])->name('bbcode.preview');
-
-Route::prefix('hotel')
-    ->name('hotel.')
-    ->group(function() {
-        Route::get('online-count', [ApiController::class, 'getOnlineCount'])->name('online-count');
-    });
-
-Route::prefix('profile')
-    ->name('profile.')
-    ->group(function() {
-        Route::prefix('shop')
-            ->name('shop.')
-            ->group(function() {
-                Route::get('categories', [ProfileController::class, 'getShopCategories'])->name('categories');
-                Route::get('category/{categoryId}/items', [ProfileController::class, 'getShopItemsByCategory'])->name('items-by-category');
-                Route::get('type/{type}/items', [ProfileController::class, 'getShopItemsByType'])->name('items-by-type');
-            });
-
-        Route::get('{username}/inventory', [ProfileController::class, 'getUserInventory'])->name('inventory');
-    });
-
-Route::prefix('shop')
-    ->name('shop.')
-    ->group(function() {
-        Route::get('products/{id}', [ShopProductController::class, 'show'])->name('products.show');
-    });
+Route::get('/user/{username}', [HotelApiController::class, 'fetchUser'])->name('api.fetch-user')->middleware('throttle:50,1');
+Route::get('/users/search', [HotelApiController::class, 'searchUsers'])->name('api.search-users')->middleware('throttle:60,1');
+Route::get('/online-users', [HotelApiController::class, 'onlineUsers'])->name('api.online-users')->middleware('throttle:50,1');
+Route::get('/online-count', [HotelApiController::class, 'onlineUserCount'])->name('api.online-count')->middleware('throttle:50,1');
+Route::post('/paypal/webhook', PaypalWebhookController::class)->name('paypal.webhook');

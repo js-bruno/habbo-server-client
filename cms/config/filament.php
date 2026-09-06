@@ -1,5 +1,7 @@
 <?php
 
+use Filament\Support\Commands\FileGenerators\FileGenerationFlag;
+
 return [
 
     /*
@@ -23,9 +25,10 @@ return [
         //     'wsHost' => env('VITE_PUSHER_HOST'),
         //     'wsPort' => env('VITE_PUSHER_PORT'),
         //     'wssPort' => env('VITE_PUSHER_PORT'),
-        //     'authEndpoint' => '/api/v1/broadcasting/auth',
+        //     'authEndpoint' => '/broadcasting/auth',
         //     'disableStats' => true,
         //     'encrypted' => true,
+        //     'forceTLS' => true,
         // ],
 
     ],
@@ -35,8 +38,8 @@ return [
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |
-    | This is the storage disk Filament will use to put media. You may use any
-    | of the disks defined in the `config/filesystems.php`.
+    | This is the storage disk Filament will use to store files. You may use
+    | any of the disks defined in the `config/filesystems.php`.
     |
     */
 
@@ -58,6 +61,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cache Path
+    |--------------------------------------------------------------------------
+    |
+    | This is the directory that Filament will use to store cache files that
+    | are used to optimize the registration of components.
+    |
+    | After changing the path, you should run `php artisan filament:cache-components`.
+    |
+    */
+
+    'cache_path' => base_path('bootstrap/cache/filament'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Livewire Loading Delay
     |--------------------------------------------------------------------------
     |
@@ -70,5 +87,13 @@ return [
     */
 
     'livewire_loading_delay' => 'default',
+
+    'file_generation' => [
+        'flags' => [
+            FileGenerationFlag::EMBEDDED_PANEL_RESOURCE_SCHEMAS, // Define new forms and infolists inside the resource class instead of a separate schema class.
+            FileGenerationFlag::EMBEDDED_PANEL_RESOURCE_TABLES, // Define new tables inside the resource class instead of a separate table class.
+            FileGenerationFlag::PARTIAL_IMPORTS, // Partially import components such as form fields and table columns instead of importing each component explicitly.
+        ],
+    ],
 
 ];

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Home\HomeCategory;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class HomeCategorySeeder extends Seeder
@@ -18,7 +17,7 @@ class HomeCategorySeeder extends Seeder
         foreach ($this->getDefaultHomeCategories() as $category) {
             HomeCategory::firstOrCreate(['name' => $category[0]], [
                 'icon' => $category[1],
-                'order' => $order++
+                'order' => $order++,
             ]);
         }
     }
@@ -28,80 +27,80 @@ class HomeCategorySeeder extends Seeder
         return [
             [
                 'Cine',
-                'https://i.imgur.com/DH45rww.png'
+                'home-items/cat-cine.png',
             ],
             [
                 'Bling Alphabet',
-                'https://i.imgur.com/miq0Aiv.png'
+                'home-items/cat-bling-alphabet.png',
             ],
             [
                 'Keep it Real',
-                'https://i.imgur.com/pmSUjjP.png'
+                'home-items/cat-keep-it-real.png',
             ],
             [
                 'Summer Vacation',
-                'https://i.imgur.com/abzSMEH.gif'
+                'home-items/cat-summer-vacation.gif',
             ],
             [
                 'Pirates',
-                'https://i.imgur.com/XTRzzsI.png'
+                'home-items/cat-pirates.png',
             ],
             [
                 'Plastic Alphabet',
-                'https://i.imgur.com/A3VBOq9.png'
+                'home-items/cat-plastic-alphabet.png',
             ],
             [
                 'Valentine',
-                'https://i.imgur.com/K0HqFx4.png'
+                'home-items/cat-valentine.png',
             ],
             [
                 'Wooden Alphabet',
-                'https://i.imgur.com/ziDIYgy.png'
+                'home-items/cat-wooden-alphabet.png',
             ],
             [
                 'Buttons',
-                'https://i.imgur.com/lzfYaYp.png'
+                'home-items/cat-buttons.png',
             ],
             [
                 'Alhambra',
-                'https://i.imgur.com/Jry4aC6.png'
+                'home-items/cat-alhambra.png',
             ],
             [
                 'Sports',
-                'https://i.imgur.com/BDCtism.png'
+                'home-items/cat-sports.png',
             ],
             [
                 'WWE',
-                'https://i.imgur.com/ML7YRub.png'
+                'home-items/cat-wwe.png',
             ],
             [
                 'Paintings',
-                'https://i.imgur.com/UCvX3St.png'
+                'home-items/cat-paintings.png',
             ],
             [
                 'Dividers',
-                'https://i.imgur.com/vgjnpff.png'
+                'home-items/cat-dividers.png',
             ],
             [
                 'SnowStorm',
-                'https://i.imgur.com/oevdfAb.png'
+                'home-items/cat-snowstorm.png',
             ],
             [
                 'Habboween',
-                'https://i.imgur.com/NibQAwu.png'
+                'home-items/cat-habboween.png',
             ],
             [
                 'Coins and Related',
-                'https://imgur.com/2dv241o.png'
+                'home-items/cat-coins-and-related.png',
             ],
             [
                 'Forest and Related',
-                'https://imgur.com/93S5hn6.png'
+                'home-items/cat-forest-and-related.png',
             ],
             [
                 'Clamps and Related',
-                'https://imgur.com/9cAAtv0.png'
-            ]
+                'home-items/cat-clamps-and-related.png',
+            ],
         ];
     }
 }

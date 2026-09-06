@@ -11,22 +11,12 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    /** @param  array<string, mixed>  $args */
     public function jsonResponse(array $args, int $status = 200): JsonResponse
     {
         return response()->json([
             'success' => in_array($status, [200, 201]),
-            ...$args
+            ...$args,
         ], $status);
-    }
-
-    public function externalJsonResponse(string $type, string $message): JsonResponse
-    {
-        return $this->jsonResponse([
-            'type' => $type,
-            'message' => $message
-        ], $type == 'success'
-            ? 200
-            : 400
-        );
     }
 }

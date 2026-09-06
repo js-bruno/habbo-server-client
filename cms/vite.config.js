@@ -1,26 +1,41 @@
-import { defineConfig } from 'vite'
-import laravel from 'laravel-vite-plugin'
-import Path from 'path'
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+import path from "path";
+import tailwindcss from "@tailwindcss/postcss";
+import autoprefixer from "autoprefixer";
 
 export default defineConfig({
-    build: {
-        outDir: Path.join(__dirname, 'public', 'build'),
-        emptyOutDir: true,
-    },
-    server: {
-        host: 'localhost'
-    },
     plugins: [
         laravel({
-            input: ['resources/scss/app.scss', 'resources/js/app.js', 'resources/js/client.js'],
-            refresh: true,
-            transformOnServe: (code) => code.replaceAll('/assets/', '/public/assets/'),
+            input: [
+                "resources/css/global.css",
+                "resources/js/global.js",
+            ],
         }),
+
+        {
+            name: "blade",
+            handleHotUpdate({ file, server }) {
+                if (file.endsWith(".blade.php")) {
+                    server.ws.send({
+                        type: "full-reload",
+                        path: "*",
+                    });
+                }
+            },
+        },
     ],
     resolve: {
         alias: {
-            '@public': '/public',
-            '@packages': '/node_modules'
-        }
-    }
-})
+            "@": "/resources/js",
+        },
+    },
+    css: {
+        postcss: {
+            plugins: [
+                tailwindcss(),
+                autoprefixer(),
+            ],
+        },
+    },
+});

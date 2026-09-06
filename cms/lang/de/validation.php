@@ -4,178 +4,164 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Validierungssprachenzeilen
+    | Validation Language Lines
     |--------------------------------------------------------------------------
     |
-    | Die folgenden Sprachzeilen enthalten die von verwendeten Standardfehlermeldungen
-    | die Validatorklasse. Für einige dieser Regeln gibt es mehrere Versionen, beispielsweise die
-    | Größenregeln. Fühlen Sie sich frei, jede dieser Nachrichten hier zu optimieren.
+    | The following language lines contain the default error messages used by
+    | the validator class. Some of these rules have multiple versions such
+    | as the size rules. Feel free to tweak each of these messages here.
     |
     */
 
-    'accepted' => 'Das Feld :attribute muss akzeptiert werden.',
-    'accepted_if' => 'Das Feld :attribute muss akzeptiert werden, wenn :other den Wert :value hat.',
-    'active_url' => 'Das Feld :attribute muss eine gültige URL sein.',
-    'after' => 'Das Feld :attribute muss ein Datum nach :date enthalten.',
-    'after_or_equal' => 'Das :attribute Feld muss ein Datum nach oder gleich :date sein.',
-    'alpha' => 'Das Feld :attribute darf nur Buchstaben enthalten.',
-    'alpha_dash' => 'Das Feld :attribute darf nur Buchstaben, Zahlen, Bindestriche und Unterstriche enthalten.',
-    'alpha_num' => 'Das Feld :attribute darf nur Buchstaben und Zahlen enthalten.',
-    'array' => 'Das :attribute Feld muss ein Array sein.',
-    'ascii' => 'Das Feld :attribute darf nur alphanumerische Einzelbyte Zeichen und -Symbole enthalten.',
-    'before' => 'Das Feld :attribute muss ein Datum vor :date enthalten.',
-    'before_or_equal' => 'Das :attribute Feld muss ein Datum vor oder gleich :date sein.',
+    'accepted' => 'The :attribute must be accepted.',
+    'accepted_if' => 'The :attribute must be accepted when :other is :value.',
+    'active_url' => 'The :attribute is not a valid URL.',
+    'after' => 'The :attribute must be a date after :date.',
+    'after_or_equal' => 'The :attribute must be a date after or equal to :date.',
+    'alpha' => 'The :attribute must only contain letters.',
+    'alpha_dash' => 'The :attribute must only contain letters, numbers, dashes and underscores.',
+    'alpha_num' => 'The :attribute must only contain letters and numbers.',
+    'array' => 'The :attribute must be an array.',
+    'before' => 'The :attribute must be a date before :date.',
+    'before_or_equal' => 'The :attribute must be a date before or equal to :date.',
     'between' => [
-        'array' => 'Das :attribute Feld muss Elemente zwischen :min und :max enthalten.',
-        'file' => 'Das :attribute Feld muss zwischen :min und :max Kilobyte groß sein.',
-        'numeric' => 'Das :attribute Feld muss zwischen :min und :max liegen.',
-        'string' => 'Das :attribute Feld muss zwischen :min und :max Zeichen enthalten.',
+        'array' => 'The :attribute must have between :min and :max items.',
+        'file' => 'The :attribute must be between :min and :max kilobytes.',
+        'numeric' => 'The :attribute must be between :min and :max.',
+        'string' => 'The :attribute must be between :min and :max characters.',
     ],
-    'boolean' => 'Das Feld :attribute muss wahr oder falsch sein.',
-    'confirmed' => 'Die Bestätigung des :attribute Feldes stimmt nicht überein.',
-    'current_password' => 'Das Passwort ist inkorrekt.',
-    'date' => 'Das Feld :attribute muss ein gültiges Datum sein.',
-    'date_equals' => 'Das :attribute Feld muss ein Datum sein, das :date entspricht.',
-    'date_format' => 'Das Feld :attribute muss dem Format :format entsprechen.',
-    'decimal' => 'Das :attribute eld muss :decimal Dezimalstellen enthalten.',
-    'declined' => 'Das Feld :attribute muss abgelehnt werden.',
-    'declined_if' => 'Das Feld „:attribute“ muss abgelehnt werden, wenn „:other“ den Wert „:value“ hat.',
-    'different' => 'Das :attribute Feld und :other müssen unterschiedlich sein.',
-    'digits' => 'Das :attribute Feld muss :digits Ziffern enthalten.',
-    'digits_between' => 'Das :attribute Feld muss zwischen :min und :max Ziffern enthalten.',
-    'dimensions' => 'Das Feld :attribute weist ungültige Bildabmessungen auf.',
-    'distinct' => 'Das Feld :attribute hat einen doppelten Wert.',
-    'doesnt_end_with' => 'Das :attribute Feld darf nicht mit einem der folgenden Werte enden: :values.',
-    'doesnt_start_with' => 'Das :attribute Feld darf nicht mit einem der folgenden Werte beginnen: :values.',
-    'email' => 'Das Feld :attribute muss eine gültige E-Mail-Adresse sein.',
-    'ends_with' => 'Das :attribute Feld muss mit einem der folgenden Werte enden: :values.',
-    'enum' => 'Das ausgewählte :Attribut ist ungültig.',
-    'exists' => 'Das ausgewählte :Attribut ist ungültig.',
-    'file' => 'Das :attribute Feld muss eine Datei sein.',
-    'filled' => 'Das Feld :attribute muss einen Wert haben.',
+    'boolean' => 'The :attribute field must be true or false.',
+    'confirmed' => 'The :attribute confirmation does not match.',
+    'current_password' => 'The password is incorrect.',
+    'date' => 'The :attribute is not a valid date.',
+    'date_equals' => 'The :attribute must be a date equal to :date.',
+    'date_format' => 'The :attribute does not match the format :format.',
+    'declined' => 'The :attribute must be declined.',
+    'declined_if' => 'The :attribute must be declined when :other is :value.',
+    'different' => 'The :attribute and :other must be different.',
+    'digits' => 'The :attribute must be :digits digits.',
+    'digits_between' => 'The :attribute must be between :min and :max digits.',
+    'dimensions' => 'The :attribute has invalid image dimensions.',
+    'distinct' => 'The :attribute field has a duplicate value.',
+    'doesnt_start_with' => 'The :attribute may not start with one of the following: :values.',
+    'email' => 'The :attribute must be a valid email address.',
+    'ends_with' => 'The :attribute must end with one of the following: :values.',
+    'enum' => 'The selected :attribute is invalid.',
+    'exists' => 'The selected :attribute is invalid.',
+    'file' => 'The :attribute must be a file.',
+    'filled' => 'The :attribute field must have a value.',
     'gt' => [
-        'array' => 'Das :attribute Feld muss mehr als :value Elemente enthalten.',
-        'file' => 'Das :attribute Feld muss größer als :value Kilobyte sein.',
-        'numeric' => 'Das Feld :attribute muss größer als :value sein.',
-        'string' => 'Das :attribute Feld muss mehr als :value Zeichen enthalten.',
+        'array' => 'The :attribute must have more than :value items.',
+        'file' => 'The :attribute must be greater than :value kilobytes.',
+        'numeric' => 'The :attribute must be greater than :value.',
+        'string' => 'The :attribute must be greater than :value characters.',
     ],
     'gte' => [
-        'array' => 'Das :attribute Feld muss :value Elemente oder mehr enthalten.',
-        'file' => 'Das :attribute Feld muss größer oder gleich :value Kilobyte sein.',
-        'numeric' => 'Das Feld :attribute muss größer oder gleich :value sein.',
-        'string' => 'Das :attribute Feld muss größer oder gleich :value Zeichen sein.',
+        'array' => 'The :attribute must have :value items or more.',
+        'file' => 'The :attribute must be greater than or equal to :value kilobytes.',
+        'numeric' => 'The :attribute must be greater than or equal to :value.',
+        'string' => 'The :attribute must be greater than or equal to :value characters.',
     ],
-    'image' => 'Das :attribute Feld muss ein Bild sein.',
-    'in' => 'Das ausgewählte :attribut ist ungültig.',
-    'in_array' => 'Das :attribute Feld muss in :other vorhanden sein.',
-    'integer' => 'Das Feld :attribute muss eine Ganzzahl sein.',
-    'ip' => 'Das Feld :attribute muss eine Ganzzahl sein.',
-    'ipv4' => 'Das Feld :attribute muss eine gültige IPv4-Adresse sein.',
-    'ipv6' => 'Das Feld :attribute muss eine gültige IPv6-Adresse sein.',
-    'json' => 'Das :attribute Feld muss eine gültige JSON Zeichenfolge sein.',
-    'lowercase' => 'Das Feld :attribute muss aus Kleinbuchstaben bestehen.',
+    'image' => 'The :attribute must be an image.',
+    'in' => 'The selected :attribute is invalid.',
+    'in_array' => 'The :attribute field does not exist in :other.',
+    'integer' => 'The :attribute must be an integer.',
+    'ip' => 'The :attribute must be a valid IP address.',
+    'ipv4' => 'The :attribute must be a valid IPv4 address.',
+    'ipv6' => 'The :attribute must be a valid IPv6 address.',
+    'json' => 'The :attribute must be a valid JSON string.',
     'lt' => [
-        'array' => 'Das :attribute Feld muss weniger als :value Elemente enthalten.',
-        'file' => 'Das :attribute Feld muss kleiner als :value Kilobyte sein.',
-        'numeric' => 'Das :attribute Feld muss kleiner als :value sein.',
-        'string' => 'Das :attribute Feld muss weniger als :value Zeichen enthalten.',
+        'array' => 'The :attribute must have less than :value items.',
+        'file' => 'The :attribute must be less than :value kilobytes.',
+        'numeric' => 'The :attribute must be less than :value.',
+        'string' => 'The :attribute must be less than :value characters.',
     ],
     'lte' => [
-        'array' => 'Das :attribute Feld darf nicht mehr als :value Elemente enthalten.',
-        'file' => 'Das :attribute Feld muss kleiner oder gleich :value Kilobyte sein.',
-        'numeric' => 'Das Feld :attribute muss kleiner oder gleich :value sein.',
-        'string' => 'Das :attribute Feld muss kleiner oder gleich :value Zeichen sein.',
+        'array' => 'The :attribute must not have more than :value items.',
+        'file' => 'The :attribute must be less than or equal to :value kilobytes.',
+        'numeric' => 'The :attribute must be less than or equal to :value.',
+        'string' => 'The :attribute must be less than or equal to :value characters.',
     ],
-    'mac_address' => 'Das Feld :attribute muss eine gültige MAC-Adresse sein.',
+    'mac_address' => 'The :attribute must be a valid MAC address.',
     'max' => [
-        'array' => 'Das :attribute Feld darf nicht mehr als :max Elemente enthalten',
-        'file' => 'Das :attribute Feld darf nicht größer als :max Kilobyte sein.',
-        'numeric' => 'Das :attribute Feld darf nicht größer als :max sein.',
-        'string' => 'Das :attribute Feld darf nicht länger als :max Zeichen sein.',
+        'array' => 'The :attribute must not have more than :max items.',
+        'file' => 'The :attribute must not be greater than :max kilobytes.',
+        'numeric' => 'The :attribute must not be greater than :max.',
+        'string' => 'The :attribute must not be greater than :max characters.',
     ],
-    'max_digits' => 'Das :attribute Feld darf nicht mehr als :max Ziffern enthalten.',
-    'mimes' => 'Das :attribute Feld muss eine Datei vom Typ: :values sein.',
-    'mimetypes' => 'Das :attribute Feld muss eine Datei vom Typ: :values sein.',
+    'mimes' => 'The :attribute must be a file of type: :values.',
+    'mimetypes' => 'The :attribute must be a file of type: :values.',
     'min' => [
-        'array' => 'Das :attribute Feld muss mindestens :min Elemente enthalten.',
-        'file' => 'Das :attribute Feld muss mindestens :min Kilobyte groß sein.',
-        'numeric' => 'Das :attribute Feld muss mindestens :min sein.',
-        'string' => 'Das :attribute Feld muss mindestens :min Zeichen lang sein.',
+        'array' => 'The :attribute must have at least :min items.',
+        'file' => 'The :attribute must be at least :min kilobytes.',
+        'numeric' => 'The :attribute must be at least :min.',
+        'string' => 'The :attribute must be at least :min characters.',
     ],
-    'min_digits' => 'Das :attribute Feld muss mindestens :min Ziffern enthalten.',
-    'missing' => 'Das Feld :attribute muss fehlen.',
-    'missing_if' => 'Das Feld :attribute muss fehlen, wenn :other den Wert :value hat.',
-    'missing_unless' => 'Das Feld :attribute muss fehlen, es sei denn, :other ist :value.',
-    'missing_with' => 'Das Feld :attribute muss fehlen, wenn :values vorhanden ist.',
-    'missing_with_all' => 'Das Feld :attribute muss fehlen, wenn :values vorhanden ist.',
-    'multiple_of' => 'Das :attribute Feld muss ein Vielfaches von :value sein.',
-    'not_in' => 'Das ausgewählte :Attribut ist ungültig.',
-    'not_regex' => 'Das :attribute Feldformat ist ungültig.',
-    'numeric' => 'Das :attribute Feld muss eine Zahl sein.',
+    'multiple_of' => 'The :attribute must be a multiple of :value.',
+    'not_in' => 'The selected :attribute is invalid.',
+    'not_regex' => 'The :attribute format is invalid.',
+    'numeric' => 'The :attribute must be a number.',
     'password' => [
-        'letters' => 'Das Feld :attribute muss mindestens einen Buchstaben enthalten.',
-        'mixed' => 'Das Feld :attribute muss mindestens einen Groß- und einen Kleinbuchstaben enthalten.',
-        'numbers' => 'Das Feld :attribute muss mindestens eine Zahl enthalten.',
-        'symbols' => 'Das Feld :attribute muss mindestens ein Symbol enthalten.',
-        'uncompromised' => 'Das angegebene :attribute ist in einem Datenleck aufgetaucht. Bitte wählen Sie ein anderes :attribut.',
+        'letters' => 'The :attribute must contain at least one letter.',
+        'mixed' => 'The :attribute must contain at least one uppercase and one lowercase letter.',
+        'numbers' => 'The :attribute must contain at least one number.',
+        'symbols' => 'The :attribute must contain at least one symbol.',
+        'uncompromised' => 'The given :attribute has appeared in a data leak. Please choose a different :attribute.',
     ],
-    'present' => 'Das Feld :attribute muss vorhanden sein.',
-    'prohibited' => 'Das Feld :attribute ist verboten.',
-    'prohibited_if' => 'Das Feld :attribute ist verboten, wenn :other den Wert :value hat.',
-    'prohibited_unless' => 'Das Feld :attribute ist verboten, es sei denn, :other ist in :values enthalten.',
-    'prohibits' => 'Das :attribute Feld verhindert, dass :other vorhanden ist.',
-    'regex' => 'Das :attribute Feldformat ist ungültig.',
-    'required' => 'Das Feld :attribute ist erforderlich.',
-    'required_array_keys' => 'Das :attribute Feld muss Einträge für: :values enthalten.',
-    'required_if' => 'Das Feld :attribute ist erforderlich, wenn :other den Wert :value hat.',
-    'required_if_accepted' => 'Das Feld :attribute ist erforderlich, wenn :other akzeptiert wird.',
-    'required_unless' => 'Das Feld :attribute ist erforderlich, es sei denn, :other ist in :values enthalten.',
-    'required_with' => 'Das Feld :attribute ist erforderlich, wenn :values vorhanden ist.',
-    'required_with_all' => 'Das :attribute Feld ist erforderlich, wenn :values vorhanden sind.',
-    'required_without' => 'Das Feld :attribute ist erforderlich, wenn :values nicht vorhanden ist.',
-    'required_without_all' => 'Das :attribute Feld ist erforderlich, wenn keiner der :values vorhanden ist.',
-    'same' => 'Das :attribute Feld muss mit :other übereinstimmen.',
+    'present' => 'The :attribute field must be present.',
+    'prohibited' => 'The :attribute field is prohibited.',
+    'prohibited_if' => 'The :attribute field is prohibited when :other is :value.',
+    'prohibited_unless' => 'The :attribute field is prohibited unless :other is in :values.',
+    'prohibits' => 'The :attribute field prohibits :other from being present.',
+    'regex' => 'The :attribute format is invalid.',
+    'required' => 'The :attribute field is required.',
+    'required_array_keys' => 'The :attribute field must contain entries for: :values.',
+    'required_if' => 'The :attribute field is required when :other is :value.',
+    'required_unless' => 'The :attribute field is required unless :other is in :values.',
+    'required_with' => 'The :attribute field is required when :values is present.',
+    'required_with_all' => 'The :attribute field is required when :values are present.',
+    'required_without' => 'The :attribute field is required when :values is not present.',
+    'required_without_all' => 'The :attribute field is required when none of :values are present.',
+    'same' => 'The :attribute and :other must match.',
     'size' => [
-        'array' => 'Das :attribute Feld muss :size Elemente enthalten.',
-        'file' => 'Das :attribute Feld muss :size Kilobyte sein.',
-        'numeric' => 'Das :attribute Feld muss :size sein.',
-        'string' => 'Das :attribute Feld muss :size Zeichen enthalten.',
+        'array' => 'The :attribute must contain :size items.',
+        'file' => 'The :attribute must be :size kilobytes.',
+        'numeric' => 'The :attribute must be :size.',
+        'string' => 'The :attribute must be :size characters.',
     ],
-    'starts_with' => 'Das :attribute Feld muss mit einem der folgenden Werte beginnen: :values.',
-    'string' => 'Das :attribute Feld muss eine Zeichenfolge sein.',
-    'timezone' => 'Das Feld :attribute muss eine gültige Zeitzone sein.',
-    'unique' => 'Das :attribut wurde bereits vergeben.',
-    'uploaded' => 'Das :attribute konnte nicht hochgeladen werden.',
-    'uppercase' => 'Das Feld :attribute muss in Großbuchstaben geschrieben sein.',
-    'url' => 'Das Feld :attribute muss eine gültige URL sein.',
-    'ulid' => 'Das :attribute Feld muss eine gültige ULID sein.',
-    'uuid' => 'Das :attribute Feld muss eine gültige UUID sein.',
+    'starts_with' => 'The :attribute must start with one of the following: :values.',
+    'string' => 'The :attribute must be a string.',
+    'timezone' => 'The :attribute must be a valid timezone.',
+    'unique' => 'The :attribute has already been taken.',
+    'uploaded' => 'The :attribute failed to upload.',
+    'url' => 'The :attribute must be a valid URL.',
+    'uuid' => 'The :attribute must be a valid UUID.',
 
     /*
     |--------------------------------------------------------------------------
-    | Benutzerdefinierte Validierungssprachenzeilen
+    | Custom Validation Language Lines
     |--------------------------------------------------------------------------
     |
-    | Hier können Sie benutzerdefinierte Validierungsmeldungen für Attribute angeben,
-    | indem Sie die Konvention „attribute.rule“ verwenden, um die Zeilen zu benennen.
-    | Dies ermöglicht die schnelle Angabe einer bestimmten benutzerdefinierten
-    | Sprachzeile für eine bestimmte Attributregel.
+    | Here you may specify custom validation messages for attributes using the
+    | convention "attribute.rule" to name the lines. This makes it quick to
+    | specify a specific custom language line for a given attribute rule.
+    |
     */
 
     'custom' => [
         'attribute-name' => [
-            'rule-name' => 'benutzerdefinierte Nachricht',
+            'rule-name' => 'custom-message',
         ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Benutzerdefinierte Validierungsattribute
+    | Custom Validation Attributes
     |--------------------------------------------------------------------------
     |
-    | Die folgenden Sprachzeilen werden verwendet, um unseren Attributplatzhalter durch
-    | etwas leserfreundlicheres wie „E-Mail-Adresse“ anstelle von „E-Mail“ zu ersetzen.
-    | Dies hilft uns einfach, unsere Botschaft ausdrucksvoller zu machen.
+    | The following language lines are used to swap our attribute placeholder
+    | with something more reader friendly such as "E-Mail Address" instead
+    | of "email". This simply helps us make our message more expressive.
     |
     */
 

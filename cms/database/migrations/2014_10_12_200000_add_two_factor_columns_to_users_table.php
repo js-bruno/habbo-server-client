@@ -12,20 +12,28 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $skipSimilarMigrations = config('app.skip_similar_migrations');
-        $hasColumn = fn (string $table, string $column) => Schema::hasColumn($table, $column);
+        $addSecret = ! Schema::hasColumn('users', 'two_factor_secret');
+        $addRecoveryCodes = ! Schema::hasColumn('users', 'two_factor_recovery_codes');
+        $addConfirmedAt = Fortify::confirmsTwoFactorAuthentication()
+            && ! Schema::hasColumn('users', 'two_factor_confirmed_at');
 
-        Schema::table('users', function (Blueprint $table) use ($skipSimilarMigrations, $hasColumn) {
-            if (!$skipSimilarMigrations || !$hasColumn('users', 'two_factor_secret')) {
-                $table->text('two_factor_secret')->after('password')->nullable();
+        Schema::table('users', function (Blueprint $table) use ($addConfirmedAt, $addRecoveryCodes, $addSecret) {
+            if ($addSecret) {
+                $table->text('two_factor_secret')
+                    ->after('password')
+                    ->nullable();
             }
 
-            if (!$skipSimilarMigrations || !$hasColumn('users', 'two_factor_recovery_codes')) {
-                $table->text('two_factor_recovery_codes')->after('two_factor_secret')->nullable();
+            if ($addRecoveryCodes) {
+                $table->text('two_factor_recovery_codes')
+                    ->after('two_factor_secret')
+                    ->nullable();
             }
 
-            if (Fortify::confirmsTwoFactorAuthentication() && (!$skipSimilarMigrations || !$hasColumn('users', 'two_factor_confirmed_at'))) {
-                $table->timestamp('two_factor_confirmed_at')->after('two_factor_recovery_codes')->nullable();
+            if ($addConfirmedAt) {
+                $table->timestamp('two_factor_confirmed_at')
+                    ->after('two_factor_recovery_codes')
+                    ->nullable();
             }
         });
     }

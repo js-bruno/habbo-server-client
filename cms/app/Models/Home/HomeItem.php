@@ -2,63 +2,81 @@
 
 namespace App\Models\Home;
 
-use App\Enums\CurrencyType;
-use Illuminate\Database\Eloquent\{
-    Model,
-    Relations\BelongsTo,
-    Factories\HasFactory
-};
+use App\Enums\CurrencyTypes;
+use App\Enums\HomeItemType;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property HomeItemType $type
+ * @property CurrencyTypes $currency_type
+ */
 class HomeItem extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected $guarded = [];
 
-    protected $casts = [
-        'currency_type' => CurrencyType::class,
-        'enabled' => 'boolean'
-    ];
-
-    protected $availableWidgets = [
+    /** @var array<string, string> */
+    protected array $availableWidgets = [
         'My Profile' => 'my-profile',
         'My Friends' => 'my-friends',
         'My Guestbook' => 'my-guestbook',
         'My Badges' => 'my-badges',
         'My Rooms' => 'my-rooms',
         'My Groups' => 'my-groups',
-        'My Rating' => 'my-rating'
+        'My Rating' => 'my-rating',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'type' => HomeItemType::class,
+            'currency_type' => CurrencyTypes::class,
+            'enabled' => 'boolean',
+        ];
+    }
+
+    /** @return BelongsTo<HomeCategory, $this> */
     public function homeCategory(): BelongsTo
     {
         return $this->belongsTo(HomeCategory::class);
     }
 
+    /** @return HasMany<UserHomeItem, $this> */
     public function userHomeItems(): HasMany
     {
         return $this->hasMany(UserHomeItem::class, 'home_item_id');
     }
 
-    public function exceededPurchaseLimit(): bool
+    /** @param Builder<static> $query */
+    public function scopeEnabled(Builder $query): void
     {
-        return $this->total_bought >= $this->limit;
+        $query->where('enabled', true);
+    }
+
+    public function hasExceededPurchaseLimit(): bool
+    {
+        return $this->limit !== null && $this->total_bought >= $this->limit;
     }
 
     public function getDefaultTheme(): ?string
     {
-        if($this->type == 'n') {
-            return 'note';
-        }
-
-        if($this->type == 'w') {
-            return 'default';
-        }
-
-        return null;
+        return match ($this->type) {
+            HomeItemType::Note => 'note',
+            HomeItemType::Widget => 'default',
+            default => null,
+        };
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getAvailableWidgets(): array
     {
         return $this->availableWidgets;

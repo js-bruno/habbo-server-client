@@ -2,11 +2,16 @@
 
 namespace App\Providers;
 
-use App\Listeners\LogoutListener;
-use Illuminate\Auth\Events\Logout;
-use SocialiteProviders\Manager\SocialiteWasCalled;
-use SocialiteProviders\Discord\DiscordExtendSocialite;
+use App\Models\Community\Staff\WebsiteTeam as StaffWebsiteTeam;
+use App\Models\Community\Teams\WebsiteTeam;
+use App\Models\Game\Permission;
+use App\Models\User;
+use App\Observers\CommunityCacheObserver;
+use App\Observers\UserObserver;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -16,22 +21,22 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        Logout::class => [
-            LogoutListener::class,
+        Registered::class => [
+            SendEmailVerificationNotification::class,
         ],
+    ];
 
-        SocialiteWasCalled::class => [
-            DiscordExtendSocialite::class . '@handle'
-        ]
+    protected $observers = [
+        User::class => [UserObserver::class, CommunityCacheObserver::class],
+        Permission::class => [CommunityCacheObserver::class],
+        StaffWebsiteTeam::class => [CommunityCacheObserver::class],
+        WebsiteTeam::class => [CommunityCacheObserver::class],
     ];
 
     /**
      * Register any events for your application.
      */
-    public function boot(): void
-    {
-        //
-    }
+    public function boot(): void {}
 
     /**
      * Determine if events and listeners should be automatically discovered.

@@ -2,313 +2,261 @@
 
 namespace App\Services;
 
-use App\Enums\CurrencyType;
-use Socket;
-use Carbon\Carbon;
+use App\Contracts\Rcon;
+use App\Data\RconResponse;
+use App\Enums\CurrencyTypes;
+use App\Exceptions\RconConnectionException;
 use App\Models\User;
-use Error;
-use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
+use JsonException;
 
-class RconService
+class RconService implements Rcon
 {
-    /**
-     * Socket creation
-     *
-     * @var Socket resource
-     */
-    protected Socket $socket;
+    public function __construct(
+        private readonly ?string $host = null,
+        private readonly ?int $port = null,
+    ) {}
 
-    /**
-     * Socket connected
-     *
-     * @var boolean resource
-     */
-    protected $connected;
-
-    /**
-     * Initialise socket connection
-     *
-     * @return void
-     */
-    protected function connect(): void
+    public function isConnected(): bool
     {
-        if (!config('hotel.rcon.enabled')) return;
+        try {
+            $socket = $this->connect();
+            fclose($socket);
 
-        if (!function_exists('socket_create')) {
-            abort(500, sprintf("socket_create function doesn't exist. PHP Error: [%s]", socket_strerror(socket_last_error())));
+            return true;
+        } catch (RconConnectionException) {
+            return false;
         }
+    }
+
+    public function sendCommand(string $command, ?array $data = null): RconResponse
+    {
+        $payload = json_encode(['key' => $command, 'data' => $data], JSON_THROW_ON_ERROR);
+        $socket = $this->connect();
 
         try {
-            $this->socket = socket_create(config('hotel.rcon.domain'), config('hotel.rcon.type'), config('hotel.rcon.protocol'));
-        } catch (\Throwable) {
-            throw new Error(sprintf('socket_create failed. PHP Error: [%s]', socket_strerror(socket_last_error())));
-        }
+            $this->write($socket, $payload);
+            stream_socket_shutdown($socket, STREAM_SHUT_WR);
 
-        try {
-            $this->connected = socket_connect($this->socket, config('hotel.rcon.host'), config('hotel.rcon.port'));
-        } catch (\Throwable) {
-            throw new Error(sprintf('socket_create failed. PHP Error: [%s]', socket_strerror(socket_last_error())));
+            $response = stream_get_contents($socket);
+            $metadata = stream_get_meta_data($socket);
+
+            if ($metadata['timed_out']) {
+                throw new RconConnectionException("RCON command '{$command}' timed out waiting for a response");
+            }
+
+            if ($response === false || trim($response) === '') {
+                throw new RconConnectionException("RCON command '{$command}' returned an empty response");
+            }
+
+            return $this->parseResponse($command, $response);
+        } finally {
+            fclose($socket);
         }
     }
 
     /**
-     * Send a packet to the tcp server.
+     * Arcturus accepts one JSON request per TCP connection and closes the
+     * connection after writing its response.
+     *
+     * @return resource
      */
-    public function sendPacket(string $key, $data = null)
+    private function connect()
     {
-        $this->connect();
+        $errorCode = 0;
+        $errorMessage = '';
+        $timeout = max(0.1, (float) config('habbo.rcon.connect_timeout_seconds', 1));
+        $socket = @stream_socket_client(
+            $this->endpoint(),
+            $errorCode,
+            $errorMessage,
+            $timeout,
+            STREAM_CLIENT_CONNECT,
+        );
 
-        $data = json_encode([
-            'key' => $key,
-            'data' => $data
-        ]);
-
-        $request = socket_write($this->socket, $data, strlen($data));
-
-        if ($request === false) {
-            abort(500, sprintf('socket_write failed. PHP Error: [%s]', socket_strerror(socket_last_error())));
+        if ($socket === false) {
+            throw new RconConnectionException("Unable to connect to RCON: {$errorMessage} ({$errorCode})");
         }
 
-        $response = socket_read($this->socket, 2048);
-        return json_decode($response);
+        $readTimeout = max(0.1, (float) config('habbo.rcon.read_timeout_seconds', 2));
+        $seconds = (int) $readTimeout;
+        $microseconds = (int) (($readTimeout - $seconds) * 1_000_000);
+        stream_set_timeout($socket, $seconds, $microseconds);
+
+        return $socket;
+    }
+
+    private function endpoint(): string
+    {
+        $host = trim($this->host ?? (string) setting('rcon_ip'));
+        $port = $this->port ?? (int) setting('rcon_port');
+
+        if ($host === '' || $port < 1 || $port > 65535) {
+            throw new RconConnectionException('RCON host or port is not configured correctly');
+        }
+
+        $formattedHost = str_contains($host, ':') && ! str_starts_with($host, '[')
+            ? "[{$host}]"
+            : $host;
+
+        return "tcp://{$formattedHost}:{$port}";
     }
 
     /**
-     * Send gift to a user.
+     * @param  resource  $socket
      */
-    public function sendGift(User $user, int $item_id, string $message = 'Here is a gift.')
+    private function write($socket, string $payload): void
     {
-        return $this->sendPacket('sendgift', [
+        $written = 0;
+        $length = strlen($payload);
+
+        while ($written < $length) {
+            $bytes = fwrite($socket, substr($payload, $written));
+
+            if ($bytes === false || $bytes === 0) {
+                throw new RconConnectionException('RCON connection closed before the command was fully written');
+            }
+
+            $written += $bytes;
+        }
+    }
+
+    private function parseResponse(string $command, string $response): RconResponse
+    {
+        try {
+            $decoded = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new RconConnectionException("RCON command '{$command}' returned malformed JSON", previous: $exception);
+        }
+
+        if (
+            ! is_array($decoded)
+            || ! isset($decoded['status'], $decoded['message'])
+            || ! is_int($decoded['status'])
+            || ! is_string($decoded['message'])
+        ) {
+            throw new RconConnectionException("RCON command '{$command}' returned an invalid response");
+        }
+
+        return new RconResponse($decoded['status'], $decoded['message']);
+    }
+
+    /**
+     * Typed RCON helpers are fire-and-forget operations. Preserve that contract
+     * while retaining transport and emulator failures in the application log.
+     *
+     * @param  array<string, mixed>|null  $data
+     */
+    private function dispatchCommand(string $command, ?array $data = null): void
+    {
+        try {
+            $response = $this->sendCommand($command, $data);
+
+            if (! $response->successful()) {
+                Log::warning('RCON command was rejected by the emulator', [
+                    'command' => $command,
+                    'status' => $response->status,
+                    'message' => $response->message,
+                ]);
+            }
+        } catch (RconConnectionException $exception) {
+            Log::error('RCON command failed', [
+                'command' => $command,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function sendGift(User $user, int $itemId, string $message = 'Here is a gift.'): void
+    {
+        $this->dispatchCommand('sendgift', [
             'user_id' => $user->id,
-            'itemid' => $item_id,
+            'itemid' => $itemId,
             'message' => $message,
         ]);
     }
 
-    /**
-     * Give credits to user.
-     */
-    public function giveCurrency(User $user, string $currency, int $amount)
+    public function giveCurrency(User $user, CurrencyTypes $currency, int $amount): void
     {
-        if (! in_array($currency, array_merge(CurrencyType::values(), ['credits']))) return;
+        if ($currency === CurrencyTypes::Credits) {
+            $this->dispatchCommand('givecredits', [
+                'user_id' => $user->id,
+                'credits' => $amount,
+            ]);
 
-        $data = [
-            'user_id' => $user->id
-        ];
-
-        if ($currency == 'credits') {
-            $data[$currency] = $amount;
-
-            return $this->sendPacket('givecredits', $data);
+            return;
         }
 
-        $data['type'] = (int) $currency;
-        $data['points'] = $amount;
-
-        return $this->sendPacket('givepoints', $data);
-    }
-
-    /**
-     * Disconnect the user.
-     *
-     * @param user $user
-     * @return mixed
-     */
-    public function disconnectUser(User $user)
-    {
-        return $this->sendPacket('disconnect', [
+        $this->dispatchCommand('givepoints', [
             'user_id' => $user->id,
-            'username' => $user->username,
+            'points' => $amount,
+            'type' => $currency,
         ]);
     }
 
-    /**
-     * Mute the user.
-     */
-    public function muteUser(User $user, Carbon $duration)
+    public function giveBadge(User $user, string $badge): void
     {
-        return $this->sendPacket('muteuser', [
-            'user_id' => $user->id,
-            'duration' => $duration->timestamp
-        ]);
-    }
-
-    /**
-     * Reload user credits.
-     */
-    public function reloadCredits($user)
-    {
-        return $this->sendPacket('reloadcredits', [
-            'user_id' => $user->id
-        ]);
-    }
-
-    /**
-     * Send badge to a user.
-     */
-    public function sendBadge(User $user, string $badge)
-    {
-        return $this->sendPacket('givebadge', [
+        $this->dispatchCommand('givebadge', [
             'user_id' => $user->id,
             'badge' => $badge,
         ]);
     }
 
-    /**
-     * Send badge to a user.
-     */
-    public function removeBadge(User $user, string $badge)
+    public function setMotto(User $user, string $motto): void
     {
-        return $this->sendPacket('removebadge', [
-            'user_id' => $user->id,
-            'badge' => $badge,
-        ]);
-    }
-
-    /**
-     * Update users motto.
-     */
-    public function setMotto(User $user, string $motto)
-    {
-        return $this->sendPacket('setmotto', [
+        $this->dispatchCommand('setmotto', [
             'user_id' => $user->id,
             'motto' => $motto,
         ]);
     }
 
-    /**
-     * Update the word filter.
-     */
-    public function updateWordFilter()
+    public function updateWordFilter(): void
     {
-        return $this->sendPacket('updatewordfilter');
+        $this->dispatchCommand('updatewordfilter');
     }
 
-    /**
-     * Update user data.
-     */
-    public function updateUser(User $user, array $data)
+    public function disconnectUser(User $user): void
     {
-        return $this->sendPacket('updateuser', [
+        $this->dispatchCommand('disconnect', [
             'user_id' => $user->id,
-            ...$data
+            'username' => $user->username,
         ]);
     }
 
-    /**
-     * Update users username.
-     */
-    public function changeUsername(User $user, bool $canChange = false)
+    public function setRank(User $user, int $rank): void
     {
-        return $this->sendPacket('changeusername', [
-            'user_id' => $user->id,
-            'canChange' => $canChange,
-        ]);
-    }
-
-    /**
-     * Set users rank.
-     */
-    public function setRank(User $user, int $rank)
-    {
-        return $this->sendPacket('setrank', [
+        $this->dispatchCommand('setrank', [
             'user_id' => $user->id,
             'rank' => $rank,
         ]);
     }
 
-    /**
-     * Update the catalog.
-     */
-    public function updateCatalog()
+    public function updateCatalog(): void
     {
-        return $this->sendPacket('updatecatalog');
+        $this->dispatchCommand('updatecatalog');
     }
 
-    /**
-     * Send user an alert.
-     */
-    public function alertUser(User $user, string $message)
+    public function alertUser(User $user, string $message): void
     {
-        return $this->sendPacket('alertuser', [
+        $this->dispatchCommand('alertuser', [
             'user_id' => $user->id,
             'message' => $message,
         ]);
     }
 
-    /**
-     * Send user to a room.
-     */
-    public function forwardUser(User $user, int $roomId)
+    public function forwardUser(User $user, int $roomId): void
     {
-        return $this->sendPacket('forwarduser', [
+        $this->dispatchCommand('forwarduser', [
             'user_id' => $user->id,
             'room_id' => $roomId,
         ]);
     }
 
-    /**
-     * Send hotel alert.
-     */
-    public function hotelAlert(string $message, ?string $url)
+    public function updateConfig(User $user, string $command): void
     {
-        return $this->sendPacket('hotelalert', [
-            'message' => $message,
-            'url' => $url,
+        $this->dispatchCommand('executecommand', [
+            'user_id' => $user->id,
+            'command' => $command,
         ]);
-    }
-
-    /**
-     * Send staff alert.
-     */
-    public function staffAlert(string $message)
-    {
-        return $this->sendPacket('staffalert', [
-            'message' => $message
-        ]);
-    }
-
-    /**
-     * Follow to a user.
-     */
-    public function followUser(int|User $currentUser, int|User $user)
-    {
-        return $this->sendPacket('stalkuser', [
-            'user_id' => $currentUser instanceof User ? $currentUser->id : $currentUser,
-            'follow_id' => $user instanceof User ? $user->id : $user,
-        ]);
-    }
-
-    public function sendSafely($method, array $args, $fallback = null)
-    {
-        try {
-            $this->{$method}(...$args);
-        } catch (\Throwable $e) {
-            if ($fallback) $fallback($e);
-        }
-    }
-
-    public function sendSafelyFromDashboard($method, array $args, $notificationTitle)
-    {
-        $this->sendSafely(
-            $method,
-            $args,
-            fn () => Notification::make()
-                ->danger()
-                ->persistent()
-                ->title($notificationTitle)
-                ->body(__('Please check your RCON connection and try again.'))
-                ->send()
-        );
-    }
-
-    public function sendSafelyFromShop($method, array $args, $notificationTitle)
-    {
-        $this->sendSafely(
-            $method,
-            $args,
-            fn () => Log::error($notificationTitle)
-        );
     }
 }

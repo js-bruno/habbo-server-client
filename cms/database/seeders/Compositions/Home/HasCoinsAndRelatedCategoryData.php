@@ -9,16 +9,16 @@ trait HasCoinsAndRelatedCategoryData
     public function getCoinsAndRelatedItemsData(HomeCategory $category): array
     {
         return [
-            $this->buildItemStructure($category, 'https://imgur.com/ua4PVEw.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/nTSfbuB.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/xzVtJLs.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/n45C0lN.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/yuCbyCi.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/JoAnVpH.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/Y3EfOaM.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/7PaD1Ah.png'),
-            $this->buildItemStructure($category, 'https://imgur.com/2y9rc8b.gif'),
-            $this->buildItemStructure($category, 'https://imgur.com/y67yCaq.png'),
+            $this->buildItemStructure($category, 'home-items/cine-item-28.png'),
+            $this->buildItemStructure($category, 'home-items/cine-item-9.png'),
+            $this->buildItemStructure($category, 'home-items/cine-item-11.png'),
+            $this->buildItemStructure($category, 'home-items/cine-item-10.png'),
+            $this->buildItemStructure($category, 'home-items/pirates-item-10.png'),
+            $this->buildItemStructure($category, 'home-items/pirates-item-11.png'),
+            $this->buildItemStructure($category, 'home-items/coins-and-related-item-7.png'),
+            $this->buildItemStructure($category, 'home-items/coins-and-related-item-8.png'),
+            $this->buildItemStructure($category, 'home-items/coins-and-related-item-9.gif'),
+            $this->buildItemStructure($category, 'home-items/coins-and-related-item-10.png'),
         ];
     }
 }

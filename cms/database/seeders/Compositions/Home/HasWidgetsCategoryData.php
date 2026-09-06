@@ -11,13 +11,13 @@ trait HasWidgetsCategoryData
         $this->currentOrder = 1;
 
         DB::table('home_items')->insert([
-            $this->buildItemStructure(null, 'https://imgur.com/MZiw18o.png', 'My Profile', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/Ac7XcJQ.png', 'My Friends', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/iNcpO2q.png', 'My Guestbook', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/gWpDn8t.png', 'My Badges', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/9h35Bkm.png', 'My Rooms', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/oNDGmYS.png', 'My Groups', 30, 'w'),
-            $this->buildItemStructure(null, 'https://imgur.com/2dkPaE9.png', 'My Rating', 30, 'w')
+            $this->buildItemStructure(null, 'home-items/widget-my-profile.png', 'My Profile', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-friends.png', 'My Friends', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-guestbook.png', 'My Guestbook', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-badges.png', 'My Badges', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-rooms.png', 'My Rooms', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-groups.png', 'My Groups', 30, 'w'),
+            $this->buildItemStructure(null, 'home-items/widget-my-rating.png', 'My Rating', 30, 'w'),
         ]);
     }
 }

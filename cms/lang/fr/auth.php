@@ -13,13 +13,8 @@ return [
     |
     */
 
-    'failed' => 'Ces informations d\'identification ne correspondent pas à nos enregistrements.',
-    'password' => 'Le mot de passe fourni est incorrect.',
-    'throttle' => 'Trop de tentatives de connexion. Veuillez réessayer dans :seconds secondes.',
-    'recaptcha_failed' => 'La vérification reCAPTCHA a échoué.',
-    'turnstile_failed' => 'La vérification de Turnstile a échoué.',
-    'max_accounts_per_ip' => 'Vous avez atteint le nombre maximum de comptes par adresse IP.',
-    'invalid_ip' => 'Adresse IP invalide.',
-    'registration_disabled' => 'L\'inscription est désactivée.'
+    'failed' => 'These credentials do not match our records.',
+    'password' => 'The provided password is incorrect.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
 
 ];

@@ -1,0 +1,159 @@
+<?php
+
+namespace App\Models\Compositions;
+
+use App\Emulator\Contracts\BadgeRepository;
+use App\Enums\HomeItemType;
+use App\Models\Home\HomeItem;
+use App\Models\Home\UserHomeItem;
+use App\Models\Home\UserHomeMessage;
+use App\Models\Home\UserHomeRating;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
+
+trait HasHome
+{
+    // Transient aggregate built by loadRatingsForHome() for the profile view.
+    public ?UserHomeRating $homeRatingStats = null;
+
+    /**
+     * @return HasMany<UserHomeItem, $this>
+     */
+    public function homeItems(): HasMany
+    {
+        return $this->hasMany(UserHomeItem::class);
+    }
+
+    /**
+     * @return HasMany<UserHomeItem, $this>
+     */
+    public function inventoryHomeItems(): HasMany
+    {
+        return $this->homeItems()
+            ->defaultRelationships()
+            ->where('placed', false);
+    }
+
+    /**
+     * @return HasMany<UserHomeItem, $this>
+     */
+    public function groupedInventoryItems(): HasMany
+    {
+        return $this->inventoryHomeItems()
+            ->select(DB::raw('home_item_id, JSON_ARRAYAGG(id) as item_ids'))
+            ->groupBy('home_item_id');
+    }
+
+    /**
+     * @return HasMany<UserHomeItem, $this>
+     */
+    public function placedHomeItems(): HasMany
+    {
+        return $this->homeItems()
+            ->defaultRelationships()
+            ->where('placed', true);
+    }
+
+    /**
+     * @return HasMany<UserHomeRating, $this>
+     */
+    public function homeRatings(): HasMany
+    {
+        return $this->hasMany(UserHomeRating::class, 'rated_user_id');
+    }
+
+    /**
+     * @return HasMany<UserHomeMessage, $this>
+     */
+    public function receivedHomeMessages(): HasMany
+    {
+        return $this->hasMany(UserHomeMessage::class, 'recipient_user_id');
+    }
+
+    /**
+     * @return HasMany<UserHomeMessage, $this>
+     */
+    public function sentHomeMessages(): HasMany
+    {
+        return $this->hasMany(UserHomeMessage::class, 'user_id');
+    }
+
+    public function giveHomeItem(HomeItem $item, int $quantity = 1): void
+    {
+        $this->homeItems()->insert(
+            array_fill(0, $quantity, [
+                'user_id' => $this->id,
+                'home_item_id' => $item->id,
+                'theme' => $item->getDefaultTheme(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]),
+        );
+
+        $item->increment('total_bought', $quantity);
+    }
+
+    public function changeHomeBackground(UserHomeItem $background): void
+    {
+        $this->placedHomeItems()
+            ->whereHas('homeItem', fn ($query) => $query->where('type', HomeItemType::Background))
+            ->update(['placed' => false]);
+
+        $background->update(['placed' => true]);
+    }
+
+    public function loadRoomsForHome(): self
+    {
+        return $this->load([
+            'rooms' => fn (HasMany $query) => $query->select('id', 'owner_id', 'name', 'description', 'state'),
+        ]);
+    }
+
+    public function loadRatingsForHome(): self
+    {
+        $stats = $this->homeRatings()
+            ->selectRaw('AVG(rating) as rating_avg, COUNT(*) as total, COUNT(IF(rating >= 4, 4, NULL)) as most_positive')
+            ->first();
+
+        $this->homeRatingStats = $stats ?? new UserHomeRating([
+            'rating_avg' => 0,
+            'total' => 0,
+            'most_positive' => 0,
+        ]);
+        $this->homeRatingStats->rating_avg = number_format((float) ($this->homeRatingStats->rating_avg ?? 0), 1);
+
+        return $this;
+    }
+
+    public function loadFriendsForHome(string $routeName): self
+    {
+        $this->setRelation('friends',
+            $this->friends()
+                ->select('user_two_id')
+                ->with('user:id,username,look,online')
+                ->orderByDesc('id')
+                ->paginate(8, ['*'], 'friends_page')
+                ->withPath(route($routeName, $this->username)),
+        );
+
+        return $this;
+    }
+
+    public function loadBadgesForHome(string $routeName): self
+    {
+        $this->setRelation('badges',
+            app(BadgeRepository::class)
+                ->paginate($this, 16, 'badges_page')
+                ->withPath(route($routeName, $this->username)),
+        );
+
+        return $this;
+    }
+
+    public function loadGuestbookForHome(): self
+    {
+        return $this->load([
+            'receivedHomeMessages' => fn ($query) => $query->latest()->defaultUserData(),
+        ]);
+    }
+}
