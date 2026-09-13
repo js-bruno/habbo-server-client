@@ -1,4 +1,5 @@
 { pkgs, config, lib, ... }:
+
 {
   devenv.root = let
     env_root = builtins.getEnv "PWD";
@@ -14,7 +15,7 @@
 
   languages.php = {
     enable = true;
-    version = "8.5";
+    version = "8.6";
     fpm.pools.orion = {
       settings = {
         "pm" = "dynamic";
@@ -83,7 +84,38 @@
   };
 
   enterShell = ''
+    ROOT="${config.env.DEVENV_ROOT}"
+    MYSQL_STATE="$ROOT/.devenv/state/mysql"
 
+    if [ -d "$MYSQL_STATE" ]; then
+      PID_FILE=$(find "$MYSQL_STATE" -maxdepth 1 -name "*.pid" 2>/dev/null | head -1)
+      STALE=0
+
+      if [ -n "$PID_FILE" ] && [ -f "$PID_FILE" ]; then
+        OLD_PID=$(cat "$PID_FILE" 2>/dev/null)
+        if [ -n "$OLD_PID" ] && ! kill -0 "$OLD_PID" 2>/dev/null; then
+          STALE=1
+        fi
+      fi
+
+      if [ -f "$MYSQL_STATE/ibdata1" ] && [ ! -S "$MYSQL_STATE/mysql.sock" ]; then
+        RUNNING=$(pgrep -f "mysqld.*$MYSQL_STATE" || true)
+        if [ -z "$RUNNING" ]; then
+          STALE=1
+        fi
+      fi
+
+      if [ "$STALE" = "1" ]; then
+        echo ""
+        echo "⚠ Detectado estado do MySQL de um desligamento anterior não finalizado corretamente."
+        echo "  Isso costuma causar 'wrong space ID' / corrupção do InnoDB ao subir de novo."
+        echo "  Removendo automaticamente $MYSQL_STATE para evitar o erro..."
+        rm -rf "$MYSQL_STATE"
+        echo "✓ Estado do MySQL limpo. Ele será recriado do zero no próximo 'devenv up'."
+        echo "  Rode 'arcturus-load-schema' depois de subir, para reimportar o schema."
+        echo ""
+      fi
+    fi
   '';
 
   scripts.arcturus-reset-db.exec = ''
