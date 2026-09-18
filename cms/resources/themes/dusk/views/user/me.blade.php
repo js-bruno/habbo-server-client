@@ -163,6 +163,12 @@
                         </x-form.secondary-button>
                     </div>
 
+                    <a href="{{ route('invite.index') }}" class="col-span-12 md:col-span-2">
+                        <x-form.primary-button>
+                            {{ __('Invite friends') }}
+                        </x-form.primary-button>
+                    </a>
+
                 </div>
 
                 @if (auth()->user()->referrals?->referrals_total >= (int) setting('referrals_needed'))

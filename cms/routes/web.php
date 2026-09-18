@@ -36,6 +36,7 @@ use App\Http\Controllers\User\ForgotPasswordController;
 use App\Http\Controllers\User\MeController;
 use App\Http\Controllers\User\PasswordSettingsController;
 use App\Http\Controllers\User\ReferralController;
+use App\Http\Controllers\User\InviteController;
 use App\Http\Controllers\User\TwoFactorAuthenticationController;
 use App\Http\Controllers\User\UserReferralController;
 use Illuminate\Support\Facades\Route;
@@ -77,6 +78,11 @@ Route::middleware(['maintenance', 'check.ban', 'force.staff.2fa'])->group(functi
 
         Route::get('/register/{referral_code}', UserReferralController::class)->name('register.referral');
 
+        // Invite links: the invitee picks a username, the system generates the
+        // password, shows it once and redirects straight into the Nitro client.
+        Route::get('/invite/{code}', [InviteController::class, 'show'])->name('invite.show')->where('code', '[a-z0-9]+');
+        Route::post('/invite/{code}', [InviteController::class, 'redeem'])->name('invite.redeem')->where('code', '[a-z0-9]+');
+
         // Password
         Route::get('forgot-password', ForgotPasswordController::class)->name('forgot.password.get');
         Route::post('forgot-password', [ForgotPasswordController::class, 'submitForgetPassword'])->middleware('throttle:6,1')->name('forgot.password.post');
@@ -88,6 +94,9 @@ Route::middleware(['maintenance', 'check.ban', 'force.staff.2fa'])->group(functi
     Route::middleware('auth')->group(function () {
         Route::prefix('user')->group(function () {
             Route::get('/me', MeController::class)->name('me.show');
+            Route::get('/invite', [InviteController::class, 'index'])->name('invite.index');
+            Route::post('/invite', [InviteController::class, 'store'])->name('invite.store');
+            Route::get('/invite/success', [InviteController::class, 'success'])->name('invite.success');
             Route::post('/claim/referral-reward', ReferralController::class)
                 ->middleware('throttle:5,1')
                 ->name('claim.referral-reward');
