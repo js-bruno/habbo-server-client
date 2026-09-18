@@ -1,0 +1,23 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+
+    level: 8
+
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        # Turnstile package may not be installed in all environments
+        - identifier: class.notFound
+          path: app/Rules/TurnstileCheck.php
+
+        # Schema::hasTable() result can change after migration runs
+        - identifier: booleanNot.alwaysTrue
+          path: app/Http/Middleware/InstallationMiddleware.php
+
+        # Nullsafe is intentional - these relations CAN be null at runtime despite PHPDoc
+        - identifier: nullsafe.neverNull
+          path: app/Models/User.php

@@ -1,0 +1,26 @@
+# --- Artefatos de build e dados pesados (NUNCA versionar) ---
+*.jar
+*.war
+*.class
+swf-assets/
+nitro-converter/dist/
+nitro-converter/node_modules/
+cms/public/client/          # build do client Nitro (gerado)
+cms/vendor/                 # composer install
+cms/node_modules/
+cms/storage/logs/*
+!cms/storage/logs/.gitignore
+cms/storage/framework/cache/data/*
+cms/storage/app/livewire-tmp/
+cms/.env
+
+# --- Backup/local ---
+*.log
+debug*.py
+test-register.py
+.devenv/
+
+# --- IDE/OS ---
+.idea/
+.vscode/
+.DS_Store

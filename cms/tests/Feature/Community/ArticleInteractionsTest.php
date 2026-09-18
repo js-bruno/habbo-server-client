@@ -1,0 +1,145 @@
+<?php
+
+use App\Livewire\ArticleComments;
+use App\Models\Articles\WebsiteArticle;
+use App\Models\User;
+use Livewire\Livewire;
+
+function publishArticle(User $author): WebsiteArticle
+{
+    return WebsiteArticle::create([
+        'user_id' => $author->id,
+        'title' => 'Grand opening',
+        'short_story' => 'We are open!',
+        'full_story' => '<p>Welcome to the hotel, everyone.</p>',
+        'image' => 'articles/opening.png',
+    ]);
+}
+
+beforeEach(function () {
+    installHotel();
+
+    $this->author = User::factory()->create();
+    $this->reader = User::factory()->create();
+});
+
+test('an article page renders', function () {
+    $article = publishArticle($this->author);
+
+    $this->actingAs($this->reader)
+        ->get(route('article.show', $article->slug))
+        ->assertOk()
+        ->assertSee('Grand opening');
+});
+
+test('articles with the same title receive unique slugs', function () {
+    $firstArticle = publishArticle($this->author);
+    $secondArticle = publishArticle($this->author);
+
+    expect($firstArticle->slug)->toBe('grand-opening')
+        ->and($secondArticle->slug)->toBe('grand-opening-1');
+});
+
+test('a reader can comment and remove their own comment', function () {
+    $article = publishArticle($this->author);
+
+    $this->actingAs($this->reader)
+        ->post(route('article.comment.store', $article->slug), ['comment' => 'Congratulations on the launch!'])
+        ->assertSessionHas('success');
+
+    $comment = $article->comments()->first();
+    expect($comment)->not->toBeNull();
+
+    $this->actingAs($this->reader)
+        ->delete(route('article.comment.destroy', $comment))
+        ->assertSessionHas('success');
+
+    expect($article->comments()->count())->toBe(0);
+});
+
+test('a reader cannot delete someone else\'s comment', function () {
+    setSetting('min_staff_rank', '5');
+
+    $article = publishArticle($this->author);
+
+    $this->actingAs($this->reader)
+        ->post(route('article.comment.store', $article->slug), ['comment' => 'Congratulations on the launch!']);
+
+    $comment = $article->comments()->first();
+    $stranger = User::factory()->create(['rank' => 1]);
+
+    $this->actingAs($stranger)
+        ->delete(route('article.comment.destroy', $comment))
+        ->assertForbidden();
+
+    expect($article->comments()->count())->toBe(1);
+});
+
+test('a guest cannot post through the public article livewire component', function () {
+    $article = publishArticle($this->author);
+
+    Livewire::test(ArticleComments::class, ['article' => $article])
+        ->set('comment', 'Anonymous comment')
+        ->call('postComment')
+        ->assertForbidden();
+
+    expect($article->comments()->count())->toBe(0);
+});
+
+test('a guest can read public article comments without seeing the comment form', function () {
+    $article = publishArticle($this->author);
+    $article->update(['can_comment' => true]);
+    $article->comments()->create([
+        'user_id' => $this->reader->id,
+        'comment' => 'Visible to everyone',
+    ]);
+
+    Livewire::test(ArticleComments::class, ['article' => $article])
+        ->assertSee('Visible to everyone')
+        ->assertDontSee('Post a comment');
+});
+
+test('livewire enforces comment ownership when deleting', function () {
+    $article = publishArticle($this->author);
+    $comment = $article->comments()->create([
+        'user_id' => $this->reader->id,
+        'comment' => 'Owned by the reader',
+    ]);
+    $stranger = User::factory()->create();
+
+    Livewire::actingAs($stranger)
+        ->test(ArticleComments::class, ['article' => $article])
+        ->call('deleteComment', $comment->id)
+        ->assertForbidden();
+
+    expect($comment->fresh())->not->toBeNull();
+});
+
+test('a locked article reports the failure instead of flashing success', function () {
+    $article = publishArticle($this->author);
+    $article->update(['can_comment' => false]);
+
+    $this->actingAs($this->reader)
+        ->post(route('article.comment.store', $article->slug), ['comment' => 'Should not persist'])
+        ->assertSessionHasErrors('comment')
+        ->assertSessionMissing('success');
+
+    expect($article->comments()->count())->toBe(0);
+});
+
+test('a reader can toggle a reaction', function () {
+    $article = publishArticle($this->author);
+
+    $this->actingAs($this->reader)
+        ->post(route('article.toggle-reaction', $article->slug), ['reaction' => 'like'])
+        ->assertOk();
+
+    expect($article->reactions()->count())->toBe(1)
+        ->and($article->reactions()->first()->user_id)->toBe($this->reader->id);
+
+    $this->actingAs($this->reader)
+        ->post(route('article.toggle-reaction', $article->slug), ['reaction' => 'like'])
+        ->assertOk();
+
+    expect($article->reactions()->count())->toBe(0);
+});
