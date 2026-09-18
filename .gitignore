@@ -5,7 +5,21 @@
 swf-assets/
 nitro-converter/dist/
 nitro-converter/node_modules/
-cms/public/client/          # build do client Nitro (gerado)
+cms/public/client/*
+!cms/public/client/ui-config.json
+!cms/public/client/gamedata/
+!cms/public/client/gamedata/ExternalTexts.json
+!cms/public/client/gamedata/FurnitureData.json
+!cms/public/client/gamedata/FigureData.json
+!cms/public/client/gamedata/FigureMap.json
+!cms/public/client/gamedata/EffectMap.json
+!cms/public/client/gamedata/ProductData.json
+!cms/public/client/gamedata/HabboAvatarActions.json
+!cms/public/client/gamedata/UITexts.json
+!cms/public/client/renderer-config.json
+cms/public/client/bundled/   # assets .nitro (gerados)
+cms/public/client/js/        # build do client (gerado)
+cms/public/client/index.html # build do client (gerado)
 cms/vendor/                 # composer install
 cms/node_modules/
 cms/storage/logs/*
