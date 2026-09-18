@@ -346,9 +346,38 @@ MYSQL_PWD="$DBPASS" mysql -h 127.0.0.1 -u habbo habbo -e \
 sudo systemctl start habbo-arcturus
 # Rebuild NixOS
 cd ~/.config/nix-config && sudo nixos-rebuild switch --flake .#server
+# Build do emulador (produz o JAR que o módulo consome)
+scripts/build.sh
 # Cache do Laravel (settings do site ficam 9999999999s em Cache::rememberForever)
 # → apagar storage/framework/cache/data + restart phpfpm
 ```
+
+---
+
+## 8.5 Fluxo de build/deploy (módulo habbo-nixos)
+
+O repo `habbo-dev` é o CÓDIGO-FONTE (entra no git: `cms/`, `arcturus/src`, scripts,
+guia). Os ARTEFATOS não entram: JARs, `swf-assets/`, `nitro-converter/dist/`,
+`cms/vendor/`, `cms/node_modules/`, `cms/public/client/` (build), `.env`.
+
+O flake `habbo-retro-nix` consome este repo como `habboRoot` — o módulo declara
+`services.habbo.root` (path) e `services.habbo.enable` (bool, default true).
+Produção: o nix-config importa o módulo via input `habbo-nixos` (github) e o
+caminho default aponta para `~/projects/habbo-dev`.
+
+Ciclo de dev → deploy:
+
+1. Edita código (CMS em `cms/`, emulador em `arcturus/src/`, web em `cms/`)
+2. `scripts/build.sh` — compila o JAR do emulador (maven) + valida requisitos
+   do CMS/client. Os dados pesados ficam de fora do git (ver .gitignore)
+3. `git add/commit/push` no habbo-dev (remote: habbo-server-client)
+4. Se mudou módulo/scripts: push no habbo-retro-nix + `nix flake lock
+   --update-input habbo-nixos` no nix-config
+5. `sudo nixos-rebuild switch --flake .#server` no shatterdome
+6. Testa (ws-origin-probe + entrar no client)
+
+O `habbo-asset-convert.service` (do módulo) roda `convert-furniture.sh` no boot
+— converte SWFs → .nitro se `bundled/furniture` estiver vazio, idempotente.
 
 ---
 
