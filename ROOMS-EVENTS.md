@@ -168,7 +168,55 @@ INSERT INTO navigator_publics (public_cat_id, room_id, visible) VALUES (1, <room
 
 ---
 
-## 8. Exemplo completo (já rodado em produção)
+## 8. Conselho Arquitetônico (curadoria de salas)
+
+`scripts/conselho.py` — um curador estético que só APROVA uma sala se ela
+passar em TODOS os 8 critérios. Reprovações vêm com motivo exato.
+
+### Uso
+
+    nix shell nixpkgs#python3 --command python3 scripts/conselho.py 64
+    nix shell nixpkgs#python3 --command python3 scripts/conselho.py --todas
+    nix shell nixpkgs#python3 --command python3 scripts/conselho.py --todas --json
+
+### Os 8 critérios (nota = média, aprovação = todos)
+
+| # | Critério | Regra |
+|---|----------|-------|
+| 1 | Ocupação | densidade de móveis ≤ 15% da área andável (nem depósito, nem vazio) |
+| 2 | Circulação | mobília não bloqueia a entrada (3x3 em volta da porta) |
+| 3 | Zona social | ≥ 3 assentos agrupados (proximidade) |
+| 4 | Estilo | 1 família de estilo dominante ≥ 40% dos móveis |
+| 5 | Decoração | ≥ 3 peças de ambientação (planta/lâmpada/TV/estante) |
+| 6 | Obstrução | zero móveis sobrepostos (tapete pode ficar debaixo) |
+| 7 | Assentos | ≥ max(2, users_max÷4, 10) assentos |
+| 8 | Mesa | ≥ 50% dos 6 primeiros assentos com mesa a ≤ 2 tiles |
+
+Famílias: polyfon (retrô anos 60), silo (moderno/industrial), norja
+(bege/café), planta, lamp, tv, fridge, tapete — dict `FAMILIES` no script.
+
+### Resultado da auditoria inicial
+
+Nenhuma das 12 salas decoradas passou (média ~6.2-8.8). Motivos reais:
+
+- mesas são 2x2 (não 1x1 como o decorador assumia) → sobreposição em 11 salas
+- assentos insuficientes (3-6, precisava 7-10)
+- Teatro e Net Café sem família dominante (móveis misturados)
+- tearoom/rooftop/netcafe com a entrada bloqueada
+- Praça Central com mesas longe dos assentos
+
+Salas originais do emulador também reprovam (bundle: 75 móveis em 135 tiles
+= depósito; mansão: 4 móveis = vazia) — valida o rigor.
+
+### Fluxo para aprovar uma sala
+
+1. Rode o conselho e veja os ✗
+2. Corrija no SQL (dims reais em items_base.width/length)
+3. Re-rode até APROVADA — só aí publique
+
+---
+
+## 9. Exemplo completo (já rodado em produção)
 
 12 salas + 6 eventos criados em 2026-09-18 (ids 64-75): Praça Central, Cinema,
 Teatro, Casa de Chá, Rooftop, Pizzaria, Net Café, Pub, Lobby Novatos, Jardim
